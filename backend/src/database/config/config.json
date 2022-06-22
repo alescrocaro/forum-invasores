@@ -10,7 +10,7 @@
   "test": {
     "username": "admin",
     "password": 123456,
-    "database": "forumTest",
+    "database": "forumDB",
     "host": "127.0.0.1",
     "dialect": "postgresql",
     "port": 5432

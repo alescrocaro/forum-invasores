@@ -5,6 +5,7 @@ const { generateJwt } = require('../services/jwtService');
 module.exports = {
   async get(req, res) {
     const { id } = req.params;
+    console.log(id);
     try {
       const user = await User.findByPk(id);
 
@@ -202,7 +203,6 @@ module.exports = {
 
     try {
       const userFound = await User.findAll({ where: { email: email } });
-      console.log(userFound);
       if (userFound.length > 0)
         return res.status(400).json({ error: 'Email is already registered' });
 
@@ -219,7 +219,6 @@ module.exports = {
 
       return res.status(200).json(200);
     } catch (e) {
-      console.log(e);
       return res.status(500).json({ error: 'Internal Error' });
     }
   },
@@ -232,7 +231,7 @@ module.exports = {
       });
       if (!data) return res.status(401).json({ error: 'User not found' });
       const user = data.dataValues;
-      console.log(user);
+      //console.log(user);
       const isValid = passwordValidation(password, user.password, user.salt);
       if (!isValid) return res.status(401).json({ error: 'password invalid' });
 
@@ -244,8 +243,21 @@ module.exports = {
       );
       res.status(200).json({ token: token });
     } catch (e) {
-      console.log(e);
+      console.log(e.message);
       return res.status(500).json({ error: 'Internal error' });
+    }
+  },
+
+  async deleteAll(req, res) {
+    try {
+      await User.destroy({
+        where: {},
+        truncate: true
+      });
+      console.log('deleteall try');
+    } catch (error) {
+      console.log('deleteall catch');
+      console.log(error);
     }
   }
 };

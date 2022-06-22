@@ -20,8 +20,10 @@
     "sequelize": "^6.19.0"
   },
   "devDependencies": {
+    "axios": "^0.27.2",
     "jest": "^28.1.0",
     "nodemon": "^2.0.15",
-    "sequelize-cli": "^6.4.1"
+    "sequelize-cli": "^6.4.1",
+    "supertest": "^6.2.3"
   }
 }
