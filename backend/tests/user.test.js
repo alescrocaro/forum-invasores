@@ -14,7 +14,7 @@ describe('Teste de criação do usuário', () => {
     const res = await request(app).post('/users').send({
       firstName: 'teste1',
       lastName: 'teste1',
-      email: 'jaosidflva@gmail.com',
+      email: 'teste1@gmail.com',
       password: '123456',
       bio: ''
     });
@@ -69,6 +69,28 @@ describe('Teste de criação do usuário', () => {
       email: 'teste@gmail.com',
       password: '12345',
       bio: ''
+    });
+
+    expect(res.statusCode).toBe(401);
+  });
+});
+
+describe('Teste de login do usuário', () => {
+  //6
+  it('Login com senha errada, deve retornar status 401', async () => {
+    const res = await request(app).post('/login').send({
+      email: 'teste1@gmail.com',
+      password: 'abcdef'
+    });
+
+    expect(res.statusCode).toBe(401);
+  });
+
+  //7
+  it('Login com email inexistente no banco, deve retornar status 401', async () => {
+    const res = await request(app).post('/login').send({
+      email: 'naoexiste@gmail.com',
+      password: '123456'
     });
 
     expect(res.statusCode).toBe(401);

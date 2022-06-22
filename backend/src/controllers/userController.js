@@ -224,6 +224,7 @@ module.exports = {
   },
 
   async login(req, res) {
+    console.log('login');
     const { email, password } = req.body;
     try {
       const data = await User.findOne({
