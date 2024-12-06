@@ -15,6 +15,7 @@ export default function ListPosts() {
   const [mapSearchRadius, setMapSearchRadius] = useState(12);
   const [mapShowRadius, setMapShowRadius] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [pagination, setPagination] = useState({});
 
   const mapControls = {
     getMapCenter: () => {
@@ -38,9 +39,16 @@ export default function ListPosts() {
   };
 
   const getPosts = async (filters) => {
-    await api.get("/posts", { params: filters }).then(({ data }) => {
-      setPosts(data);
-    });
+    try {
+      await api.get("/posts", { params: filters }).then(({ data }) => {
+        console.log("Posts recebidos da API:", data);
+        setPosts(data.data);
+        setPagination(data.pagination);
+      });
+    } catch (error) {
+      console.error("Erro ao obter posts:", error);
+      setPosts([]);
+    }
   };
 
   useEffect(() => {
@@ -71,11 +79,16 @@ export default function ListPosts() {
           mapControls={mapControls}
           applyFilters={getPosts}
         />
-        {posts.length ? (
+        {Array.isArray(posts) && posts.length ? (
           posts.map((post) => <StyledCard key={post.id} post={post} />)
         ) : (
           <span>nenhuma observação encontrada</span>
         )}
+
+        <div>
+          <p>Página {pagination.page} de {pagination.totalPages}</p>
+          <p>Total de {pagination.totalElements} posts</p>
+        </div>
       </Container>
     </Layout>
   );
