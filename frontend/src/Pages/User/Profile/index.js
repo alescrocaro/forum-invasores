@@ -68,11 +68,40 @@ export default function Profile() {
 
   const bio = profileData.bio !== '' ? profileData.bio : 'Sem descrição';
 
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append('profilePicture', file);
+
+    try {
+      const response = await api.post('/users/profile-picture', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setProfileData({ ...profileData, profilePicture: response.data.profilePicture });
+    } catch (error) {
+      console.error('Error uploading profile picture:', error);
+    }
+  };
+
   return (
     <Layout>
       <Container container className="container">
         <div className="styledCard main">
-          <img className="styledAvatar" src={avatarImage} alt="avatar" />
+        <div className="avatar-container">
+          <img className="styledAvatar" src={profileData.profilePicture || avatarImage} alt="avatar" />
+          <label htmlFor="upload-button-file" className="avatar-overlay">
+            Upload Foto
+          </label>
+          <input
+            accept="image/*"
+            style={{ display: 'none' }}
+            id="upload-button-file"
+            type="file"
+            onChange={handleFileChange}
+          />
+        </div>
           <div className="styledDiv">
             Nome:
             <Paper className="styledPaper">

@@ -247,11 +247,12 @@ async function create(req, res) {
     password: hash,
     salt,
     bio,
+    profilePicture: 'profile.jpg',
   })
     .then(() => {
       return res.status(200).json(200);
     })
-    .catch(() => {
+    .catch((e) => {
       console.log(e);
       return res
         .status(500)
