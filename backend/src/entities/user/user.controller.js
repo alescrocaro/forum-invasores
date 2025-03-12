@@ -8,6 +8,7 @@ const { hashPassword, passwordValidation } = require("../../services/hash");
 const { generateJwt } = require("../../services/jwtService");
 const { user_errors } = require("../../errors/100-user");
 const { v4: uuid } = require("uuid");
+const path = require("path");
 
 async function get(req, res) {
   const { id } = req.params;
@@ -282,9 +283,54 @@ async function login(req, res) {
     return res.status(500).json({ message: "Internal error" });
   }
 }
+
+async function uploadProfilePicture(req, res) {
+  try {
+    const { id } = req.params;
+    if (!req.file) {
+      return res.status(400).json({ error: "Nenhuma imagem enviada" });
+    }
+
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ error: "Usuário não encontrado" });
+    }
+    const profilePicturePath = `/uploads/images/${req.file.filename}`;
+
+    // Atualiza o registro de foto de perfil no banco de dados
+    await User.update(
+      { profilePicture: profilePicturePath },
+      { where: { id } }
+    );
+
+    return res.status(200).json({ profilePicture: profilePicturePath });
+  } catch (error) {
+    console.error("Erro ao fazer upload da foto de perfil:", error);
+    return res.status(500).json({ error: "Erro interno no servidor" });
+  }
+}
+
+async function getProfilePicture(req, res) {
+  try {
+    const { id } = req.params;
+    const user = await User.findByPk(id);
+
+    if (!user || !user.profilePicture) {
+      return res.status(404).json({ error: "Imagem de perfil não encontrada" });
+    }
+    const imagePath = path.join(__dirname, "../../../uploads/images", path.basename(user.profilePicture));
+    res.sendFile(imagePath);
+  } catch (error) {
+    console.error("Erro ao buscar a imagem de perfil:", error);
+    return res.status(500).json({ error: "Erro interno no servidor" });
+  }
+}
+
 module.exports = {
   get,
   create,
   login,
   validateCreateAccountInput,
+  uploadProfilePicture,
+  getProfilePicture,
 };
