@@ -10,74 +10,64 @@ const { internal_errors } = require('../../errors/500-internal');
 module.exports = {
   async index(req, res) {
     try {
-      // variaveis
-      const page = req.query.page ? parseInt(req.query.page) : 1;  // 1 se n for passado
-      const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;  // 10 se n for passado
-      const offset = (page - 1) * pageSize; // calculando o offset
-  
-      //se tiver filtros
-      if (req.query.mapCenter && Array.isArray(req.query.mapCenter) && req.query.mapCenter.length === 2) {
-        const [longitude, latitude] = req.query.mapCenter;
-      
-        const distanceAttr = sequelize.fn(
-          'ST_DistanceSphere',
-          sequelize.literal('latlng'),
-          sequelize.literal(`ST_MakePoint(${latitude}, ${longitude})`)
+      // Variáveis de paginação
+      const page = req.query.page ? parseInt(req.query.page) : 1; 
+      const pageSize = req.query.pageSize ? parseInt(req.query.pageSize) : 10;
+      const offset = (page - 1) * pageSize;
+
+      // Variáveis de filtro
+      const { mapCenter, mapSearchRadius, tag } = req.query;
+
+      // Condições de filtro
+      const whereConditions = { [sequelize.Op.and]: [] };
+
+      // Filtro por localização
+      if (mapCenter && Array.isArray(mapCenter) && mapCenter.length === 2 && mapSearchRadius) {
+        const [longitude, latitude] = mapCenter;
+
+        whereConditions[sequelize.Op.and].push(
+          sequelize.literal(`
+            ST_DistanceSphere(latlng, ST_MakePoint(${latitude}, ${longitude})) <= ${parseFloat(mapSearchRadius) * 1000}
+          `)
         );
-
-        const { count, rows } = await Post.findAndCountAll({
-          include: [
-            { model: Image },
-            {
-              model: User,
-              attributes: ['name', 'email', 'id'],
-            },
-          ],
-          where: {
-            $and: sequelize.where(distanceAttr, {
-              [sequelize.Op.lte]: req.query.mapSearchRadius * 1000,
-            }),
-          },
-          order: [['updatedAt', 'DESC']],
-          limit: pageSize,
-          offset,
-        });
-
-        return res.json({
-          data: rows,
-          pagination: {
-            page,
-            pageSize,
-            totalPages: Math.ceil(count / pageSize),
-            totalElements: count,
-          },
-        });
-      } else {
-        const { count, rows } = await Post.findAndCountAll({
-          include: [
-            { model: Image },
-            {
-              model: User,
-              attributes: ['name', 'email', 'id'],
-            },
-          ],
-          order: [['updatedAt', 'DESC']],
-          limit: pageSize,
-          offset,
-        });
-        
-        return res.json({
-          data: rows,
-          pagination: {
-            page,
-            pageSize,
-            totalPages: Math.ceil(count / pageSize),
-            totalElements: count,
-          },
-        });
       }
+
+      // Filtro por tags
+      if (tag) {
+        whereConditions[sequelize.Op.and].push(
+          sequelize.literal(`
+            array_to_string("tags", ',') LIKE '%${tag}%'
+          `)
+        );
+      }
+
+      // Busca
+      const { count, rows } = await Post.findAndCountAll({
+        include: [
+          { model: Image },
+          {
+            model: User,
+            attributes: ['name', 'email', 'id'],
+          },
+        ],
+        where: whereConditions,
+        order: [['updatedAt', 'DESC']],
+        limit: pageSize,
+        offset,
+      });
+
+      // resultados 
+      return res.json({
+        data: rows,
+        pagination: {
+          page,
+          pageSize,
+          totalPages: Math.ceil(count / pageSize),
+          totalElements: count,
+        },
+      });
     } catch (error) {
-      console.error('error getting posts', error);
+      console.error('Error getting posts:', error);
       res.status(500).send();
     }
   },
