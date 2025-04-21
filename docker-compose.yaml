@@ -1,10 +1,10 @@
-version: "3.7"
+version: "3.3"
 services:
   db:
     image: postgis/postgis
     restart: always
     env_file:
-    - .env
+      - .env
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -14,14 +14,19 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5437:5432"
-  
+
   api:
     depends_on:
-      - db  # This makes sure the "db" service is started before the API service
+      - db # This makes sure the "db" service is started before the API service
     build:
       context: ./backend
       dockerfile: ./Dockerfile
-    command: ["/bin/bash", "-c", "chmod +x ./backend/wait-for-it.sh && ./backend/wait-for-it.sh db:5432 -- npm start"]
+    command:
+      [
+        "/bin/bash",
+        "-c",
+        "chmod +x ./backend/wait-for-it.sh && ./backend/wait-for-it.sh db:5432 -- npm start",
+      ]
     volumes:
       - ./backend/wait-for-it.sh:/app/backend/wait-for-it.sh
     environment:
