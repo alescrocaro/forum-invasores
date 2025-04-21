@@ -234,8 +234,6 @@ async function create(req, res) {
     }
   );
 
-  console.log("userFound: ", userFound);
-
   if (userFound) {
     return res.status(400).json({ code: 100, message: user_errors[100] });
   }

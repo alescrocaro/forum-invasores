@@ -20,34 +20,41 @@ const StyledButton = styled(Button)(() => ({
   },
 }));
 
-
-export default function UploadButton({label, imgFile, setImgFile}) {
-
+export default function UploadButton({label, imgFile, setImgFile, onImageChange}) {
   const handleOnChange = (e) => {
-    // console.log("hello")
-    const file = e.target.files[0]
-    if (!acceptedFileExtensions.includes(file.name.split('.')[1].toLowerCase())) {
-      alert('ERRO: Não foi possível reconhecer a extensão da imagem. As extensões permitidas são .jpg, .png, .jpeg, .jpe, .jif, .web, .tiff e .tif!')
-      return
+    const file = e.target.files[0];
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+    
+    if (!acceptedFileExtensions.includes(fileExtension)) {
+      alert('ERRO: Não foi possível reconhecer a extensão da imagem. As extensões permitidas são .jpg, .png, .jpeg, .jpe, .jif, .web, .tiff e .tif!');
+      return;
     }
     if(imgFile?.length >= 5 ) {
-      alert('ERRO: Você atingiu o limite de imagens para esta observação!')
-      return
+      alert('ERRO: Você atingiu o limite de imagens para esta observação!');
+      return;
     }
-    // console.log("imgFile")
-    setImgFile(old => [
-      ...old,{
-      currentFile: file,
-      id: Date.now()
-      } 
-    ])
 
-    console.log(imgFile);
-  }
+    const newImgFile = [
+      ...imgFile,
+      {
+        currentFile: file,
+        id: Date.now()
+      }
+    ];
+    
+    setImgFile(newImgFile);
+    if (onImageChange) {
+      onImageChange(newImgFile);
+    }
+  };
 
   const handleOnDelete = (id) => {
-    setImgFile(old => old.filter((element) => element.id !== id))
-  }
+    const newImgFile = imgFile.filter((element) => element.id !== id);
+    setImgFile(newImgFile);
+    if (onImageChange) {
+      onImageChange(newImgFile);
+    }
+  };
   
   return (
     <div style={{display: 'grid', gap: '16px'}}>
@@ -77,7 +84,6 @@ export default function UploadButton({label, imgFile, setImgFile}) {
           }}>
             Fotos carregadas:
           </Typography>
-        {/* <p style={{fontWeight: '600', margin}}>Fotos carregadas:</p> */}
         
         { imgFile?.length > 0 ?
           imgFile.map((element, index) => {

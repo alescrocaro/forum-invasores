@@ -1,7 +1,8 @@
 import { Autocomplete, Box, Button } from '@mui/material/';
 import { useFormik } from 'formik';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as yup from 'yup';
+import { useCreatePost } from '../../../../Context/CreatePostContext';
 import CssTextField from '../CssTextField';
 import Map from '../Map';
 import { Subtitulo, Titulo } from './style';
@@ -27,9 +28,11 @@ const validateLatlng = (str) => {
 }
 
 export default function StepLocal(props) {
+    const { formData, updateFormData } = useCreatePost();
+    
     //mapa
     //hook para pegar coordenadas no mapa
-    const [latlng, setLatlng] = useState(null);
+    const [latlng, setLatlng] = useState(formData.latlng || null);
     const latlngControls = {};
     latlngControls.changeLatlng = (coords) => {setLatlng(coords)};
     latlngControls.getLatlng = () => {return latlng};
@@ -51,11 +54,11 @@ export default function StepLocal(props) {
     //botao de criar post
     const formik = useFormik({
         initialValues: {
-            biomeName: '',
-            climateType: '',
-            state: '',
-            city: '',
-            country: '',
+          biomeName: formData.biome || '',
+          climateType: formData.weather || '',
+          state: formData.state || '',
+          city: formData.city || '',
+          country: formData.country || '',
         },
         validationSchema: yup.object({
             biomeName: yup.string('Nome do Bioma').required('Campo obrigatório'),
@@ -68,30 +71,39 @@ export default function StepLocal(props) {
             //adicionar checar mapa aqui
             if(!latlng) return alert('ERRO: Você deve anexar uma geolização!');
 
-            props.nextStep({
+            updateFormData({
                 biome: values.biomeName,
                 weather: values.climateType,
                 country: values.country,
                 state: values.state,
                 city: values.city,
-                latlng: latlng, //{lat: double, lng: double}
+                latlng: latlng,
             });
+            props.nextStep();
         }
     });
 
     //botao voltar
     const prevStepHandler = () => {
         if(window.confirm("Ao voltar, todos os dados inseridos serão perdidos, deseja voltar mesmo assim?")){
-            //resetar form
-            props.prevStep({   
-                biome: null,
-                weather: null,
-                country: null,
-                city: null,
-                latlng: null, //{lat: double, lng: double}
-            });
+            props.prevStep();
         }
     }
+
+    // Atualiza coordenadas quando recebe dados EXIF
+    useEffect(() => {
+      if (props.exifData?.coordinates) {
+        setLatlng(props.exifData.coordinates);
+      }
+    }, [props.exifData]);
+
+    // Atualiza as coordenadas quando a localizacao no form mudar
+    useEffect(() => {
+      console.log(formData.latlng)
+        if (formData.latlng) {
+            setLatlng(formData.latlng);
+        }
+    }, [formData.latlng]);
 
     //componente
     return (
