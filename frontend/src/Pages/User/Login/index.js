@@ -26,7 +26,6 @@ export default function Login() {
     },
     onSubmit: values => {
       handleLogin(values.email, values.password); // integração com context / api
-      console.log(`email: ${values.email} senha: ${values.password}`);
     }
   });
 
