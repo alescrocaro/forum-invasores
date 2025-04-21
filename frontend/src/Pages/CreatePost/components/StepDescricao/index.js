@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import {useFormik} from 'formik';
 import * as yup from 'yup';
+// import EXIF from 'exif-js';
+import { useCreatePost } from '../../../../Context/CreatePostContext';
 
 //components
 import TagsInput from "../TagsInput";
@@ -15,14 +17,15 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 
 export default function StepDescricao(props) {
-    const [ tags, setTags ] = useState([]);
+    const { formData, updateFormData } = useCreatePost();
+    const [ tags, setTags ] = useState(formData.tags || []);
 
     //botao de criar post
     const formik = useFormik({
         initialValues: {
-            title: '',
-            description: '',
-            dateEncounter: new Date(),
+            title: formData.title || '',
+            description: formData.description || '',
+            dateEncounter: formData.dateFound || new Date(),
             currentHashtag: ''
         },
         validationSchema: yup.object({
@@ -32,12 +35,16 @@ export default function StepDescricao(props) {
             currentHashtag: yup.string('currentHashtag')
         }),
         onSubmit: (values) => {
-            props.nextStep({
+            if(imgFile?.length < 1) return alert('ERRO: Você deve anexar ao menos uma foto!');
+
+            updateFormData({
                 title: values.title,
                 description: values.description,
                 dateFound: values.dateEncounter,
-                tags: tags
+                tags: tags,
+                images: imgFile
             });
+            props.nextStep();
         }
     });
 
