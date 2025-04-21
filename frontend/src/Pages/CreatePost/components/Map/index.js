@@ -1,10 +1,11 @@
+import { CircularProgress } from '@mui/material';
 import L from 'leaflet';
 import iconRetina from 'leaflet/dist/images/marker-icon-2x.png';
 import iconMarker from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import "leaflet/dist/leaflet.css";
 import React from 'react';
-import { Mapa } from './style';
+import { LoadingContainer, Mapa } from './style';
 
 const icon = L.icon({ 
     iconRetinaUrl:iconRetina, 
@@ -16,13 +17,45 @@ const icon = L.icon({
 });
   
 class Map extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isLoading: true
+        };
+    }
+
     componentDidMount(){
         // LEAFLET ----------------------------------------------------------------------
-        this.map = L.map('map').locate({setView: true, maxZoom: 9, enableHighAccuracy: true});
+        // Verifica se já existe uma localização definida
+        const initialLatlng = this.props.latlngControls.getLatlng();
+        
+        if (initialLatlng) {
+            // Se existe localização definida, foca nela
+            this.map = L.map('map').setView(
+                [parseFloat(initialLatlng.lat) || 0, parseFloat(initialLatlng.lng) || 0],
+                15
+            );
+        } else {
+            // Se não existe localização definida, tenta pegar a localização do usuário
+            this.map = L.map('map').locate({setView: true, maxZoom: 9, enableHighAccuracy: true});
+        }
           
-        L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', {
+        const tileLayer = L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', {
             attribution: '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases">CyclOSM</a> | <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(this.map);
+        
+        // Se existe localização definida, adiciona o marcador
+        if (initialLatlng) {
+            const pos = [
+                parseFloat(initialLatlng.lat) || 0,
+                parseFloat(initialLatlng.lng) || 0
+            ];
+            this.marker = L.marker(pos, {icon: icon, draggable: true}).addTo(this.map);
+            
+            this.marker.on('dragend', (e) => {
+                this.props.latlngControls.changeLatlng(e.target._latlng);
+            });
+        }
         
         this.map.on('click', (e) => {
             if(!this.marker){
@@ -38,6 +71,11 @@ class Map extends React.Component {
                 lat: e.latlng.lat.toFixed(6),
                 lng: e.latlng.lng.toFixed(6)
             });
+        });
+
+        // Quando o mapa estiver pronto, atualiza o estado
+        tileLayer.on('load', () => {
+            this.setState({ isLoading: false });
         });
         // LEAFLET ----------------------------------------------------------------------
     }
@@ -61,10 +99,17 @@ class Map extends React.Component {
     }
 
     render(){
-        return(
+      return(
+        <div style={{ position: 'relative', width: '100%', aspectRatio: '16/10' }}>
             <Mapa id='map'/>
-        );
+            {this.state.isLoading && (
+                <LoadingContainer>
+                    <CircularProgress />
+                </LoadingContainer>
+            )}
+        </div>
+      );
     }
 }
   
-  export default Map;
+export default Map;
