@@ -1,21 +1,13 @@
-import React, { useEffect } from "react";
-import PropTypes from "prop-types";
-import Chip from "@material-ui/core/Chip";
-import { makeStyles } from "@material-ui/core/styles";
-import Downshift from "downshift";
+import Chip from '@mui/material/Chip';
+import Downshift from 'downshift';
+import PropTypes from 'prop-types';
+import React, { useEffect } from 'react';
 
-import CssTextField from "../CssTextField";
-
-const useStyles = makeStyles(theme => ({
-  chip: {
-    margin: theme.spacing(0.5, 0.25)
-  }
-}));
+import CssTextField from '../CssTextField';
 
 export default function TagsInput({ ...props }) {
-  const classes = useStyles();
   const { selectedTags, placeholder, tags, ...other } = props;
-  const [inputValue, setInputValue] = React.useState("");
+  const [inputValue, setInputValue] = React.useState('');
   const [selectedItem, setSelectedItem] = React.useState([]);
   useEffect(() => {
     setSelectedItem(tags);
@@ -25,26 +17,26 @@ export default function TagsInput({ ...props }) {
   }, [selectedItem, selectedTags]);
 
   function handleKeyDown(event) {
-    if (event.key === "Enter") {
+    if (event.key === 'Enter') {
       const newSelectedItem = [...selectedItem];
       const duplicatedValues = newSelectedItem.indexOf(
         event.target.value.trim()
       );
 
       if (duplicatedValues !== -1) {
-        setInputValue("");
+        setInputValue('');
         return;
       }
-      if (!event.target.value.replace(/\s/g, "")?.length) return;
+      if (!event.target.value.replace(/\s/g, '')?.length) return;
 
       newSelectedItem.push(event.target.value.trim());
       setSelectedItem(newSelectedItem);
-      setInputValue("");
+      setInputValue('');
     }
     if (
       selectedItem?.length &&
       !inputValue?.length &&
-      event.key === "Backspace"
+      event.key === 'Backspace'
     ) {
       setSelectedItem(selectedItem.slice(0, selectedItem?.length - 1));
     }
@@ -54,7 +46,7 @@ export default function TagsInput({ ...props }) {
     if (newSelectedItem.indexOf(item) === -1) {
       newSelectedItem = [...newSelectedItem, item];
     }
-    setInputValue("");
+    setInputValue('');
     setSelectedItem(newSelectedItem);
   }
 
@@ -78,7 +70,7 @@ export default function TagsInput({ ...props }) {
         {({ getInputProps }) => {
           const { onBlur, onChange, onFocus, ...inputProps } = getInputProps({
             onKeyDown: handleKeyDown,
-            placeholder
+            placeholder,
           });
           return (
             <div>
@@ -89,7 +81,6 @@ export default function TagsInput({ ...props }) {
                       key={item}
                       tabIndex={-1}
                       label={item}
-                      className={classes.chip}
                       onDelete={handleDelete(item)}
                     />
                   )),
@@ -102,7 +93,9 @@ export default function TagsInput({ ...props }) {
                 }}
                 {...other}
                 {...inputProps}
-                onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}
+                onKeyPress={e => {
+                  e.key === 'Enter' && e.preventDefault();
+                }}
               />
             </div>
           );
@@ -112,10 +105,9 @@ export default function TagsInput({ ...props }) {
   );
 }
 TagsInput.defaultProps = {
-  tags: []
+  tags: [],
 };
 TagsInput.propTypes = {
   selectedTags: PropTypes.func.isRequired,
-  tags: PropTypes.arrayOf(PropTypes.string)
+  tags: PropTypes.arrayOf(PropTypes.string),
 };
-

@@ -9,7 +9,7 @@ import { Subtitulo, Titulo } from './style';
 
 const validateLatlng = (str) => {    
     //remove all letters and special char except . and - 
-    str = str.replace(/[^\d.\-]+/g, '');
+    str = str.replace(/[^\d.]+/g, '');
     
     //remove all . but the first
     str = str.replace(/(?<=(.*\..*))\./gm, '');

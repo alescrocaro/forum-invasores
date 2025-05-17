@@ -13,7 +13,7 @@ const Layout = ({ children }) => (
   <Flex gap="middle" wrap>
     <AntLayout style={layoutStyle}>
       <HeaderMenu />
-      <Content>{children}</Content>
+      <Content style={{ minHeight: 'calc(100vh - var(--header-height))', padding: '2rem' }}>{children}</Content>
       {/* <Footer style={footerStyle}>Footer</Footer> */}
     </AntLayout>
   </Flex>

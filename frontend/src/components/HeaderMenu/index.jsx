@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import LinkWithoutDecoration from '../LinkWithoutDecoration';
 import User from '../User';
+import { LogoImage } from '../../components/Images/imagesComponents';
 
 const headerStyle = {
   display: 'flex',
@@ -42,11 +43,7 @@ const menuOptionsStyle = {
 const Logo = () => {
   return (
     <Link to="/" style={logoStyle}>
-      <img
-        src={require('../../img/logo.png')}
-        alt="Logo invasores"
-        height={'100%'}
-      />
+      <LogoImage />
     </Link>
   );
 };
@@ -54,7 +51,7 @@ const Logo = () => {
 const MenuOptions = () => {
   return (
     <div style={menuOptionsStyle}>
-      {/* <LinkWithoutDecoration redirectUrl="/help" text="Ajuda" /> */}
+      <LinkWithoutDecoration redirectUrl="/help" text="Ajuda" />
       <LinkWithoutDecoration redirectUrl="/" text="Início" />
       <User />
     </div>
