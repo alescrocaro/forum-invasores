@@ -1,7 +1,7 @@
 module.exports = {
   content: [
-    './pages/**/*.{js,ts,jsx,tsx}',
-    './components/**/*.{js,ts,jsx,tsx}',
+    './src/**/*.{js,jsx,ts,tsx}',
+    './public/index.html',
   ],
   theme: {
     extend: {
@@ -28,6 +28,8 @@ module.exports = {
         blue: '#006AEC',
         blue_hover: '#008aec',
         green: '#256d1f',
+        "primary-gray": "var(--primary-gray)",
+        "primary-green": "var(--primary-green)",
       },
       minHeight: {
         10: '2.5rem',
