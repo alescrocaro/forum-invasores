@@ -1,34 +1,32 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {useFormik} from 'formik';
 import * as yup from 'yup';
+import { useCreatePost } from '../../../../Context/CreatePostContext';
 
 //components
 import CssTextField from '../CssTextField';
 import { Titulo, Subtitulo } from './style';
 import { Button, MenuItem } from '@mui/material/';
-import UploadButton from '../UploadButton';
 
 export default function StepEspecime(props) {
-    //imagens
-    const [imgFile, setImgFile] = useState([]);
+    const { formData, updateFormData } = useCreatePost();
 
     //yup conditional validation
-    //.when('state',
     const conditional = {
         is: (value) => !!value,
         then: yup.string().required('Campo obrigatório.')
     };
 
-    //botao de criar post
     const formik = useFormik({
         initialValues: {
-            specieKingdom: '',
-            specieDivision: '',
-            specieClass: '',
-            specieOrder: '',
-            specieFamily: '',
-            specieGenre: '',
-            specieName: '',
+            specieKingdom: formData.kingdom || '',
+            specieDivision: formData.phylum || '',
+            specieClass: formData.className || '',
+            specieOrder: formData.order || '',
+            specieFamily: formData.family || '',
+            specieGenre: formData.genus || '',
+            specieName: formData.specie || '',
+            description: formData.description || '',
         },
         validationSchema: yup.object({
             specieKingdom: yup.string('Reino').required('Campo obrigatório'),
@@ -38,12 +36,10 @@ export default function StepEspecime(props) {
             specieFamily: yup.string('Família').when(['specieGenre', 'specieName'], conditional),
             specieGenre: yup.string('Gênero').when('specieName', conditional),
             specieName: yup.string('Espécie'),
+            description: yup.string('Descrição').required('Campo obrigatório'),
         }),
         onSubmit: (values) => {
-            //adicionar checar imagens aqui
-            if(imgFile?.length < 1) return alert('ERRO: Você deve anexar ao menos uma foto!');
-
-            props.nextStep({
+            updateFormData({
                 kingdom: values.specieKingdom,
                 phylum: values.specieDivision,
                 className: values.specieClass,
@@ -51,39 +47,27 @@ export default function StepEspecime(props) {
                 family: values.specieFamily,
                 genus: values.specieGenre,
                 specie: values.specieName,
-                images: imgFile,
+                description: values.description,
             });
+            props.nextStep();
         }
     });
 
     //botao voltar
     const prevStepHandler = () => {
         if(window.confirm("Ao voltar, todos os dados inseridos serão perdidos, deseja voltar mesmo assim?")){
-            //resetar form
-            props.prevStep({   
-                kingdom: null,
-                phylum: null,
-                className: null,
-                order: null,
-                family: null,
-                genus: null,
-                specie: null,
-                images: null,
-            });
+            props.prevStep();
         }
-    }
+    };
 
-
-    //componente
     return (
         <form onSubmit={formik.handleSubmit}>
-
             <div style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
                 gap: '16px',
                 width: '100%',
-            }}>                
+            }}>
                 <div>
                 <Titulo>TAXONOMIA:</Titulo>
                 <Subtitulo>Não se preocupe se não souber tudo, coloque as informações que você conhece e os membros lhe ajudarão!</Subtitulo>
@@ -178,9 +162,20 @@ export default function StepEspecime(props) {
                 </div>
 
                 <div>
-                <Titulo>FOTOS:</Titulo>
-                <Subtitulo>Mostre-nos algumas fotos do espécime, assim os membros podem ajudar!</Subtitulo>
-                <UploadButton label={'Imagem'} imgFile={imgFile} setImgFile={setImgFile}/>
+                    <Titulo>HABITAT:</Titulo>
+                    <Subtitulo>Conte-nos mais sobre o local onde você encontrou o espécime! Exemplo: terrestre urbano, terrestre rural, terrestre unidade de conservação, etc. Adicione também pontos de referência e uma descrição do local, como "gramado alto, floresta...".</Subtitulo>
+                    <CssTextField
+                        id="description"
+                        name="description"
+                        value={formik.values.description}
+                        onChange={formik.handleChange}
+                        error={formik.touched.description && Boolean(formik.errors.description)}
+                        helperText={formik.touched.description && formik.errors.description}
+                        label={'Habitat'}
+                        multiline
+                        rows={5}
+                        fullWidth
+                    />
                 </div>
             </div>
                 

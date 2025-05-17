@@ -8,11 +8,11 @@ import {
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToken } from '../../Context/AuthContext';
+import { useCreatePost } from '../../Context/CreatePostContext';
 import Container from '../../components/Container';
 import HeaderPage from '../../components/HeaderPage';
 import Layout from '../../components/Layout';
 import { api } from '../../services/api';
-import useTrait from '../../utils/useTrait';
 import StepDescricao from './components/StepDescricao';
 import StepEspecime from './components/StepEspecime';
 import StepLocal from './components/StepLocal';
@@ -20,44 +20,46 @@ import StepLocal from './components/StepLocal';
 export default function CreatePost() {
   const { user } = useToken();
   const navigate = useNavigate();
+  const { formData, updateFormData, resetFormData } = useCreatePost();
+  const [activeStep, setActiveStep] = useState(0);
 
-  const createPost = async v => {
+  const createPost = async () => {
     try {
       const res = await api.post('/posts', {
-        title: v.title,
-        description: v.description,
-        tags: v.tags,
-        dateFound: v.dateFound,
+        title: formData.title,
+        description: formData.description,
+        tags: formData.tags,
+        dateFound: formData.dateFound,
 
         contested: 0,
         userId: user.id,
         userName: user.name,
 
-        kingdom: v.kingdom,
-        phylum: v.phylum ?? null,
-        className: v.className ?? null,
-        order: v.order ?? null,
-        family: v.family ?? null,
-        genus: v.genus ?? null,
-        specie: v.specie ?? null,
+        kingdom: formData.kingdom,
+        phylum: formData.phylum ?? null,
+        className: formData.className ?? null,
+        order: formData.order ?? null,
+        family: formData.family ?? null,
+        genus: formData.genus ?? null,
+        specie: formData.specie ?? null,
         imgUrl: '',
 
-        biome: v.biome,
-        weather: v.weather,
-        country: v.country,
-        city: v.city,
-        latlng: v.latlng, //{lat: double, lng: double}
+        biome: formData.biome,
+        weather: formData.weather,
+        country: formData.country,
+        city: formData.city,
+        latlng: formData.latlng,
       });
 
       //upload das imgs
-      if (v.images?.length > 0) {
-        const formData = new FormData();
+      if (formData.images?.length > 0) {
+        const formDataUpload = new FormData();
 
-        v.images.forEach(element => {
-          formData.append('specieImages', element.currentFile);
+        formData.images.forEach(element => {
+          formDataUpload.append('specieImages', element.currentFile);
         });
 
-        api.post(`/posts/${res.data}/image`, formData, {
+        api.post(`/posts/${res.data}/image`, formDataUpload, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -66,41 +68,36 @@ export default function CreatePost() {
 
       //ir pra pagina do post
       navigate(`/posts/${res.data}`);
+      resetFormData();
     } catch (e) {
       alert('ERRO: Algo inexperado aconteceu, tente novamente mais tarde! :(');
       setActiveStep(2);
     }
   };
 
-  const [activeStep, setActiveStep] = useState(0);
-  const formValues = useTrait({});
-
-  const nextStep = v => {
-    formValues.set({ ...formValues.get(), ...v });
+  const nextStep = (stepData) => {
+    updateFormData(stepData);
     setActiveStep(activeStep + 1);
   };
 
-  const prevStep = v => {
-    if (activeStep <= 0) return; //nao permitir voltar pra abaixo de 0
-    formValues.set({ ...formValues.get(), ...v });
+  const prevStep = (stepData) => {
+    if (activeStep <= 0) return;
+    updateFormData(stepData);
     setActiveStep(activeStep - 1);
   };
 
   //enviar requisição pra api
   useEffect(() => {
     if (activeStep > 2) {
-      createPost(formValues.get());
+      createPost();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeStep]);
 
   return (
     <Layout>
       <Container container>
-        {/* titulo da pagina */}
         <HeaderPage title="ADICIONANDO NOVA OBSERVAÇÃO:" />
 
-        {/* Conteudo */}
         <Card
           sx={{
             width: '100%',
@@ -114,7 +111,7 @@ export default function CreatePost() {
           <Stepper activeStep={activeStep} alternativeLabel>
             <Step key={1}>
               <StepLabel>
-                <p style={{ marginTop: '-10px' }}>Descrição</p>
+                <p style={{ marginTop: '-10px' }}>Fotos e Descrição</p>
               </StepLabel>
             </Step>
             <Step key={2}>

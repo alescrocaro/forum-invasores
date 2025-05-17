@@ -28,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
       password: DataTypes.STRING,
       salt: DataTypes.STRING,
       bio: DataTypes.STRING,
+      profilePicture: {
+        type: DataTypes.STRING,
+        defaultValue: 'profile.jpg',
+      },
     },
     {
       sequelize,

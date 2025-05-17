@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './Context/AuthContext';
+import { CreatePostProvider } from './Context/CreatePostContext';
 import CreatePost from './Pages/CreatePost';
 import ListPosts from './Pages/ListPost';
 import NotFound from './Pages/NotFound';
@@ -8,6 +9,7 @@ import SpecificPost from './Pages/ShowPost';
 import Login from './Pages/User/Login';
 import Profile from './Pages/User/Profile';
 import HelpPage from './Pages/Help';
+import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
   return (
@@ -17,7 +19,13 @@ export default function App() {
           <Route exact path="/" element={<ListPosts />} />
           <Route exact path="/help" element={<HelpPage />} />
           <Route exact path="/login" element={<Login />} />
-          <Route exact path="/create-post" element={<CreatePost />} />
+          <Route exact path="/create-post" element={
+            <CreatePostProvider>
+              <ProtectedRoute>
+                <CreatePost />
+              </ProtectedRoute>
+            </CreatePostProvider>
+          } />
           <Route exact path="/posts/:id" element={<SpecificPost />} />
           <Route exact path="/users/:id" element={<Profile />} />
           <Route exact path="/*" element={<NotFound />} />
