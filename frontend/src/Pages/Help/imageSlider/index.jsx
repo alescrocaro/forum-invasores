@@ -44,7 +44,7 @@ export default function ImageSlider({ images }) {
         {images.map((image, index) => (
           <div key={index}>
             {activeStep - index <= 2 ? (
-              <div style={{ position: 'relative' }}>
+              <div style={{ position: 'relative' }} className="flex justify-center items-center">
                 <Image
                   src={image}
                   style={{
