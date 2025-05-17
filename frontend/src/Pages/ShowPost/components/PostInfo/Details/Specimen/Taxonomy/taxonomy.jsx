@@ -37,7 +37,7 @@ const Taxonomy = ({ post }) => {
             }}
             disabled={isLoading}
             style={{
-              backgroundColor: 'var(--primary-color)',
+              backgroundColor: 'var(--primary-green)',
               color: 'white',
             }}
           >

@@ -3,11 +3,12 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './Context/AuthContext';
 import { CreatePostProvider } from './Context/CreatePostContext';
 import CreatePost from './Pages/CreatePost';
-import Post from './Pages/ListPost';
+import ListPosts from './Pages/ListPost';
 import NotFound from './Pages/NotFound';
 import SpecificPost from './Pages/ShowPost';
 import Login from './Pages/User/Login';
 import Profile from './Pages/User/Profile';
+import HelpPage from './Pages/Help';
 import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
@@ -15,7 +16,8 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route exact path="/" element={<Post />} />
+          <Route exact path="/" element={<ListPosts />} />
+          <Route exact path="/help" element={<HelpPage />} />
           <Route exact path="/login" element={<Login />} />
           <Route exact path="/create-post" element={
             <CreatePostProvider>

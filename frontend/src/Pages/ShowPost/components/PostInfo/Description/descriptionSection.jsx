@@ -11,7 +11,7 @@ const DescriptionSection = ({ text }) => {
         padding: '1rem',
       }}
     >
-      <Subtitulo>DESCRIÇÃO:</Subtitulo>
+      <Subtitulo>DESCRIÇÃO DO HABITAT:</Subtitulo>
       <Paper elevation={0}>
         <Descricao>{text}</Descricao>
       </Paper>
