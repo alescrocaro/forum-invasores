@@ -24,10 +24,6 @@ module.exports = {
       salt: {
         type: Sequelize.STRING,
       },
-      profilePicture: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
