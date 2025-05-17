@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {useFormik} from 'formik';
 import * as yup from 'yup';
 import { useCreatePost } from '../../../../Context/CreatePostContext';
@@ -6,10 +6,43 @@ import { useCreatePost } from '../../../../Context/CreatePostContext';
 //components
 import CssTextField from '../CssTextField';
 import { Titulo, Subtitulo } from './style';
-import { Button, MenuItem } from '@mui/material/';
+import { Button, MenuItem, Autocomplete, CircularProgress } from '@mui/material/';
 
 export default function StepEspecime(props) {
     const { formData, updateFormData } = useCreatePost();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    const searchSpecies = async (searchValue) => {
+        if (!searchValue) return;
+        setLoading(true);
+        try {
+            const response = await fetch(
+                `https://api.gbif.org/v1/species/search?q=${searchValue}&qField=VERNACULAR&rank=SPECIES&limit=10`
+            );
+            const data = await response.json();
+            setSearchResults(data.results);
+        } catch (error) {
+            console.error('Erro ao buscar espécies:', error);
+        }
+        setLoading(false);
+    };
+
+    const handleSpeciesSelect = (species) => {
+        if (!species) return;
+
+        formik.setValues({
+            ...formik.values,
+            specieKingdom: species.kingdom || '',
+            specieDivision: species.phylum || '',
+            specieClass: species.class || '',
+            specieOrder: species.order || '',
+            specieFamily: species.family || '',
+            specieGenre: species.genus || '',
+            specieName: species.species || '',
+        });
+    };
 
     //yup conditional validation
     const conditional = {
@@ -69,10 +102,55 @@ export default function StepEspecime(props) {
                 width: '100%',
             }}>
                 <div>
-                <Titulo>TAXONOMIA:</Titulo>
-                <Subtitulo>Não se preocupe se não souber tudo, coloque as informações que você conhece e os membros lhe ajudarão!</Subtitulo>
+                    <Titulo>TAXONOMIA:</Titulo>
+                    <Subtitulo>Não se preocupe se não souber tudo, coloque as informações que você conhece e os membros lhe ajudarão!</Subtitulo>
 
                     <div style={{display: 'grid', gap: '16px'}}>
+                        {/* Busca por nome comum */}
+                        <Autocomplete
+                            freeSolo
+                            options={searchResults}
+                            getOptionLabel={(option) => {
+                                if (typeof option === 'string') return option;
+                                const vernacularNames = option.vernacularNames || [];
+                                const ptName = vernacularNames.find(n => n.language === 'por');
+                                return ptName ? ptName.vernacularName : option.scientificName;
+                            }}
+                            renderOption={(props, option) => (
+                                <li {...props} key={option.key}>
+                                    {option.vernacularNames?.find(n => n.language === 'por')?.vernacularName || option.scientificName}
+                                    <span style={{ marginLeft: '8px', color: '#666', fontSize: '0.8em' }}>
+                                        ({option.scientificName})
+                                    </span>
+                                </li>
+                            )}
+                            renderInput={(params) => (
+                                <CssTextField
+                                    {...params}
+                                    label="Buscar por nome comum"
+                                    InputProps={{
+                                        ...params.InputProps,
+                                        endAdornment: (
+                                            <>
+                                                {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                                                {params.InputProps.endAdornment}
+                                            </>
+                                        ),
+                                    }}
+                                />
+                            )}
+                            onInputChange={(event, newValue) => {
+                                setSearchTerm(newValue);
+                                searchSpecies(newValue);
+                            }}
+                            onChange={(event, newValue) => {
+                                if (newValue && typeof newValue === 'object') {
+                                    handleSpeciesSelect(newValue);
+                                }
+                            }}
+                            loading={loading}
+                        />
+
                         {/* Reino > Filo > Classe > Ordem > Familia > Genero > Espécie */}
                         <CssTextField
                             label={'Reino'}
