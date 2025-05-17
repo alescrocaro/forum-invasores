@@ -26,6 +26,7 @@ export default function StepEspecime(props) {
             specieFamily: formData.family || '',
             specieGenre: formData.genus || '',
             specieName: formData.specie || '',
+            description: formData.description || '',
         },
         validationSchema: yup.object({
             specieKingdom: yup.string('Reino').required('Campo obrigatório'),
@@ -35,6 +36,7 @@ export default function StepEspecime(props) {
             specieFamily: yup.string('Família').when(['specieGenre', 'specieName'], conditional),
             specieGenre: yup.string('Gênero').when('specieName', conditional),
             specieName: yup.string('Espécie'),
+            description: yup.string('Descrição').required('Campo obrigatório'),
         }),
         onSubmit: (values) => {
             updateFormData({
@@ -45,6 +47,7 @@ export default function StepEspecime(props) {
                 family: values.specieFamily,
                 genus: values.specieGenre,
                 specie: values.specieName,
+                description: values.description,
             });
             props.nextStep();
         }
@@ -64,7 +67,7 @@ export default function StepEspecime(props) {
                 gridTemplateColumns: '1fr 1fr',
                 gap: '16px',
                 width: '100%',
-            }}>                
+            }}>
                 <div>
                 <Titulo>TAXONOMIA:</Titulo>
                 <Subtitulo>Não se preocupe se não souber tudo, coloque as informações que você conhece e os membros lhe ajudarão!</Subtitulo>
@@ -156,6 +159,23 @@ export default function StepEspecime(props) {
                             fullWidth
                         />
                     </div>
+                </div>
+
+                <div>
+                    <Titulo>HABITAT:</Titulo>
+                    <Subtitulo>Conte-nos mais sobre o local onde você encontrou o espécime! Exemplo: terrestre urbano, terrestre rural, terrestre unidade de conservação, etc. Adicione também pontos de referência e uma descrição do local, como "gramado alto, floresta...".</Subtitulo>
+                    <CssTextField
+                        id="description"
+                        name="description"
+                        value={formik.values.description}
+                        onChange={formik.handleChange}
+                        error={formik.touched.description && Boolean(formik.errors.description)}
+                        helperText={formik.touched.description && formik.errors.description}
+                        label={'Habitat'}
+                        multiline
+                        rows={5}
+                        fullWidth
+                    />
                 </div>
             </div>
                 

@@ -111,13 +111,11 @@ export default function StepDescricao(props) {
     const formik = useFormik({
         initialValues: {
             title: formData.title || '',
-            description: formData.description || '',
             dateEncounter: formData.dateFound || new Date(),
             currentHashtag: ''
         },
         validationSchema: yup.object({
             title: yup.string('Espécie + Bioma').required('Campo obrigatório'),
-            description: yup.string('Descrição').required('Campo obrigatório'),
             dateEncounter: yup.date().required('Campo obrigatório'),
             currentHashtag: yup.string('currentHashtag')
         }),
@@ -126,7 +124,6 @@ export default function StepDescricao(props) {
 
             updateFormData({
                 title: values.title,
-                description: values.description,
                 dateFound: values.dateEncounter,
                 tags: tags,
                 images: imgFile
@@ -210,23 +207,6 @@ export default function StepDescricao(props) {
                         />
                     </LocalizationProvider>
                     </div>
-                </div>
-
-                <div>
-                <Titulo>DESCRIÇÃO:</Titulo>
-                <Subtitulo>Conte-nos mais sobre como você encontrou o espécime e como é o local!</Subtitulo>
-                <CssTextField
-                    id="description"
-                    name="description"
-                    value={formik.values.description}
-                    onChange={formik.handleChange}
-                    error={formik.touched.description && Boolean(formik.errors.description)}
-                    helperText={formik.touched.description && formik.errors.description}
-                    label={'Descrição'}
-                    multiline
-                    rows={5}
-                    fullWidth
-                />
                 </div>
                 
                 <div style={{marginLeft: 'auto'}}>
