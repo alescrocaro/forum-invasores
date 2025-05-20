@@ -34,29 +34,34 @@ export default function Profile() {
     const { data } = await api.get(`users/${id}`);
     setProfileData(data);
 
-    const response = await api.get(`/users/${id}/profile-pic`, {
-      responseType: 'blob',
-    });
+    const response = await api
+      .get(`/users/${id}/profile-pic`, {
+        responseType: 'blob',
+      })
+      .catch(() => {
+        console.error('Erro ao obter a imagem do perfil');
+      });
 
-    const imageUrl = URL.createObjectURL(response.data);
-    setProfilePicUrl(imageUrl);
-
+    if (response?.data) {
+      const imageUrl = URL.createObjectURL(response.data);
+      setProfilePicUrl(imageUrl);
+    }
     setTopKingdomPosts([
       kingdoms[data.topKingdomPostsAPI[0]],
       colors[data.topKingdomPostsAPI[0]],
-      data.topKingdomPostsAPI[1]
+      data.topKingdomPostsAPI[1],
     ]);
 
     setTopKingdomComments([
       kingdoms[data.commentInfo[0]],
       colors[data.commentInfo[0]],
-      data.commentInfo[1]
+      data.commentInfo[1],
     ]);
 
     setTopKingdomContestations([
       kingdoms[data.contestationInfo[0]],
       colors[data.contestationInfo[0]],
-      data.contestationInfo[1]
+      data.contestationInfo[1],
     ]);
 
     setContributionInfo([
@@ -64,35 +69,38 @@ export default function Profile() {
       data.contributionsInfo[1],
       data.contributionsInfo[2],
       data.contributionsInfo[3],
-      data.contributionsInfo[4]
+      data.contributionsInfo[4],
     ]);
     //return data;
   }
 
-  
   const bio = profileData.bio !== '' ? profileData.bio : 'Sem descrição';
-  
-  const handleFileChange = async (event) => {
+
+  const handleFileChange = async event => {
     const file = event.target.files[0];
     if (!file) return;
-    
+
     const formData = new FormData();
     formData.append('profilePicture', file);
-    
+
     try {
-      const response = await api.post(`/users/${id}/profile-picture?timestamp=${new Date().getTime()}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      
+      const response = await api.post(
+        `/users/${id}/profile-picture?timestamp=${new Date().getTime()}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
       let imagePath = response.data.profilePicture;
       setProfilePicUrl(`${process.env.REACT_APP_BASE_URL}${imagePath}`);
       console.log(`${process.env.REACT_APP_BASE_URL}/${imagePath}`);
-      
-      setProfileData((prevData) => ({
+
+      setProfileData(prevData => ({
         ...prevData,
-        profilePicture: imagePath, 
+        profilePicture: imagePath,
       }));
     } catch (error) {
       console.error('Erro ao enviar a foto de perfil:', error);
@@ -101,15 +109,20 @@ export default function Profile() {
 
   useEffect(() => {
     getUser(id);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
-  
+
   return (
     <Layout>
       <Container container className="container">
         <div className="styledCard main">
           <div className="avatar-container">
-          <img className="styledAvatar" key={profilePicUrl} src={profilePicUrl || avatarImage} alt="avatar" />
+            <img
+              className="styledAvatar"
+              key={profilePicUrl}
+              src={profilePicUrl || avatarImage}
+              alt="avatar"
+            />
             <label htmlFor="upload-button-file" className="avatar-overlay">
               Upload Foto
             </label>
@@ -123,9 +136,7 @@ export default function Profile() {
           </div>
           <div className="styledDiv">
             Nome:
-            <Paper className="styledPaper">
-              {profileData.name}
-            </Paper>
+            <Paper className="styledPaper">{profileData.name}</Paper>
           </div>
           <div className="styledDiv">
             Bio:
