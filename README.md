@@ -9,6 +9,11 @@ Uma pessoa qualquer pode postar a foto de um possível ser invasor, então uma o
 Para visualizar as funcionalidades definidas no início do projeto, visualize [este arquivo](./firstRequirements.md)
 
 
+## Integrações com terceiros
+- [GBIF](https://techdocs.gbif.org/en/openapi)
+ Utilizada para pesquisar a taxonomia de um espécime a partir de seu nome comum.
+
+
 ## Instruções para download e execução do projeto em qualquer computador
 ### Dependências necessárias para executar o projeto:
 - React;
