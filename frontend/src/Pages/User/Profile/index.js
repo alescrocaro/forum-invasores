@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../../../services/api';
 
 import animaliaIcon from '../../../img/animaliaIcon.svg';
+import avatarImage from '../../../img/avatar.png';
+import chromistaIcon from '../../../img/chromistaIcon.svg';
 import commentIcon from '../../../img/commentIcon.svg';
 import contestationIcon from '../../../img/contestationIcon.svg';
 import fungiIcon from '../../../img/fungiIcon.svg';
@@ -10,7 +12,6 @@ import moneraIcon from '../../../img/moneraIcon.svg';
 import plantaeIcon from '../../../img/plantaeIcon.svg';
 import postIcon from '../../../img/postIcon.svg';
 import protistaIcon from '../../../img/protistaIcon.svg';
-import avatarImage from '../../../img/avatar.png';
 
 import Container from '../../../components/Container';
 import Layout from '../../../components/Layout';
@@ -19,20 +20,36 @@ import { Paper } from '@mui/material';
 
 import './style.css';
 
+const KingdomEnum = {
+  animalia: 'animalia',
+  protozoa: 'protozoa',
+  plantae: 'plantae',
+  bacteria: 'bacteria',
+  fungi: 'fungi',
+  chromista: 'chromista',
+};
+
+const KingdomColorsEnum = {
+  [KingdomEnum.animalia]: '#c71700',
+  [KingdomEnum.protozoa]: '#d1a400',
+  [KingdomEnum.plantae]: '#04b500',
+  [KingdomEnum.bacteria]: '#8f00d1',
+  [KingdomEnum.fungi]: '#7a7a7a',
+  [KingdomEnum.chromista]: '#00b5d1',
+};
+
 export default function Profile() {
   const [profileData, setProfileData] = useState({});
-  const [topKingdomPosts, setTopKingdomPosts] = useState([]);
-  const [topKingdomComments, setTopKingdomComments] = useState([]);
-  const [topKingdomContestations, setTopKingdomContestations] = useState([]);
-  const [contributionInfo, setContributionInfo] = useState([]);
+  const [topKingdomPosts, setTopKingdomPosts] = useState({});
+  const [topKingdomComments, setTopKingdomComments] = useState({});
+  const [topKingdomContestations, setTopKingdomContestations] = useState({});
+  const [contributionInfo, setContributionInfo] = useState({});
   const { id } = useParams();
-  const colors = ['#c71700', '#d1a400', '#04b500', '#8f00d1', '#7a7a7a'];
-  const kingdoms = ['ANIMALIA', 'PROTOZOA', 'PLANTAE', 'MONERA', 'FUNGI'];
   const [profilePicUrl, setProfilePicUrl] = useState('');
 
   async function getUser(id) {
     const { data } = await api.get(`users/${id}`);
-    setProfileData(data);
+    setProfileData(data.user);
 
     const response = await api
       .get(`/users/${id}/profile-pic`, {
@@ -46,32 +63,35 @@ export default function Profile() {
       const imageUrl = URL.createObjectURL(response.data);
       setProfilePicUrl(imageUrl);
     }
-    setTopKingdomPosts([
-      kingdoms[data.topKingdomPostsAPI[0]],
-      colors[data.topKingdomPostsAPI[0]],
-      data.topKingdomPostsAPI[1],
-    ]);
 
-    setTopKingdomComments([
-      kingdoms[data.commentInfo[0]],
-      colors[data.commentInfo[0]],
-      data.commentInfo[1],
-    ]);
+    const { statistics } = data ?? {};
 
-    setTopKingdomContestations([
-      kingdoms[data.contestationInfo[0]],
-      colors[data.contestationInfo[0]],
-      data.contestationInfo[1],
-    ]);
+    setTopKingdomPosts({
+      topKingdom: statistics?.topPostKingdom?.name ?? '',
+      color: KingdomColorsEnum[statistics?.topPostKingdom?.name],
+      count: statistics?.topPostKingdom?.count ?? 0,
+    });
 
-    setContributionInfo([
-      data.contributionsInfo[0],
-      data.contributionsInfo[1],
-      data.contributionsInfo[2],
-      data.contributionsInfo[3],
-      data.contributionsInfo[4],
-    ]);
-    //return data;
+    setTopKingdomComments({
+      topKingdom: statistics?.topCommentKingdom?.name ?? '',
+      color: KingdomColorsEnum[statistics?.topCommentKingdom?.name],
+      count: statistics?.topCommentKingdom?.count ?? 0,
+    });
+
+    setTopKingdomContestations({
+      topKingdom: statistics?.topContestationKingdom?.name ?? '',
+      color: KingdomColorsEnum[statistics?.topContestationKingdom?.name],
+      count: statistics?.topContestationKingdom?.count ?? 0,
+    });
+
+    setContributionInfo({
+      animalia: statistics?.animalia?.totalCount ?? 0,
+      protozoa: statistics?.protozoa?.totalCount ?? 0,
+      plantae: statistics?.plantae?.totalCount ?? 0,
+      bacteria: statistics?.bacteria?.totalCount ?? 0,
+      fungi: statistics?.fungi?.totalCount ?? 0,
+      chromista: statistics?.chromista?.totalCount ?? 0,
+    });
   }
 
   const bio = profileData.bio !== '' ? profileData.bio : 'Sem descrição';
@@ -96,14 +116,13 @@ export default function Profile() {
 
       let imagePath = response.data.profilePicture;
       setProfilePicUrl(`${process.env.REACT_APP_BASE_URL}${imagePath}`);
-      console.log(`${process.env.REACT_APP_BASE_URL}/${imagePath}`);
 
       setProfileData(prevData => ({
         ...prevData,
         profilePicture: imagePath,
       }));
     } catch (error) {
-      console.error('Erro ao enviar a foto de perfil:', error);
+      console.error('Erro ao enviar a foto de perfil');
     }
   };
 
@@ -153,9 +172,9 @@ export default function Profile() {
               <h4>POSTS:</h4>
               <h4
                 className="topContribution"
-                style={{ color: topKingdomPosts[1] }}
+                style={{ color: topKingdomPosts?.color }}
               >
-                {topKingdomPosts[0]} ({topKingdomPosts[2]})
+                {topKingdomPosts?.topKingdom} ({topKingdomPosts?.count})
               </h4>
             </div>
             <div className="contentLine">
@@ -163,9 +182,9 @@ export default function Profile() {
               <h4>COMENTÁRIOS:</h4>
               <h4
                 className="topContribution"
-                style={{ color: topKingdomComments[1] }}
+                style={{ color: topKingdomComments?.color }}
               >
-                {topKingdomComments[0]} ({topKingdomComments[2]})
+                {topKingdomComments?.topKingdom} ({topKingdomComments?.count})
               </h4>
             </div>
             <div className="contentLine">
@@ -177,9 +196,10 @@ export default function Profile() {
               <h4>CONTESTAÇÕES:</h4>
               <h4
                 className="topContribution"
-                style={{ color: topKingdomContestations[1] }}
+                style={{ color: topKingdomContestations?.color }}
               >
-                {topKingdomContestations[0]} ({topKingdomContestations[2]})
+                {topKingdomContestations?.topKingdom} (
+                {topKingdomContestations?.count})
               </h4>
             </div>
             <h3>ESPECIALIDADES:</h3>
@@ -187,7 +207,7 @@ export default function Profile() {
               <img className="icon" src={animaliaIcon} alt="animalia icon" />
               <h4 style={{ color: '#c71700' }}>ANIMALIA:</h4>
               <h4 className="topContribution">
-                {contributionInfo[0]} contribuições
+                {contributionInfo?.animalia ?? 0} contribuições
               </h4>
             </div>
             <div className="contentLine">
@@ -198,28 +218,35 @@ export default function Profile() {
               />
               <h4 style={{ color: '#d1a400' }}>PROTOZOA:</h4>
               <h4 className="topContribution">
-                {contributionInfo[1]} contribuições
+                {contributionInfo?.protozoa ?? 0} contribuições
               </h4>
             </div>
             <div className="contentLine">
               <img className="icon" src={plantaeIcon} alt="plantae icon" />
               <h4 style={{ color: '#04b500' }}>PLANTAE:</h4>
               <h4 className="topContribution">
-                {contributionInfo[2]} contribuições
+                {contributionInfo?.plantae ?? 0} contribuições
               </h4>
             </div>
             <div className="contentLine">
               <img className="icon" src={moneraIcon} alt="monera icon" />
               <h4 style={{ color: '#8f00d1' }}>MONERA:</h4>
               <h4 className="topContribution">
-                {contributionInfo[3]} contribuições
+                {contributionInfo?.monera ?? 0} contribuições
               </h4>
             </div>
             <div className="contentLine">
               <img className="icon" src={fungiIcon} alt="fungi icon" />
               <h4 style={{ color: '#7a7a7a' }}>FUNGI:</h4>
               <h4 className="topContribution">
-                {contributionInfo[4]} contribuições
+                {contributionInfo?.fungi ?? 0} contribuições
+              </h4>
+            </div>
+            <div className="contentLine">
+              <img className="icon" src={chromistaIcon} alt="chromista icon" />
+              <h4 style={{ color: '#00b5d1' }}>CHROMISTA:</h4>
+              <h4 className="topContribution">
+                {contributionInfo?.chromista ?? 0} contribuições
               </h4>
             </div>
           </div>

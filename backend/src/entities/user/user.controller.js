@@ -3,198 +3,197 @@ const {
   User,
   Comment,
   UserResolvedContestation,
-} = require("../../models");
-const { hashPassword, passwordValidation } = require("../../services/hash");
-const { generateJwt } = require("../../services/jwtService");
-const { user_errors } = require("../../errors/100-user");
-const { v4: uuid } = require("uuid");
-const path = require("path");
+} = require('../../models');
+const { hashPassword, passwordValidation } = require('../../services/hash');
+const { generateJwt } = require('../../services/jwtService');
+const { user_errors } = require('../../errors/100-user');
+const { v4: uuid } = require('uuid');
+const path = require('path');
 
 async function get(req, res) {
   const { id } = req.params;
   try {
     const user = await User.findByPk(id, {
-      include: [{ model: UserResolvedContestation, attributes: ["commentId"] }],
+      attributes: ['id', 'name', 'bio'],
     });
 
-    if (!user) return res.status(400).json({ error: "User not found" });
-    delete user["password"];
-    delete user["salt"];
+    if (!user) return res.status(400).json({ error: 'User not found' });
 
-    ////////////// descobrir reino com mais posts do usuário //////////////
-    let topKingdomPost = [];
-
-    const animaliaPosts = await Post.findAll({
+    const allPosts = await Post.findAll({
       where: {
         userId: id,
-        kingdom: "animalia",
-      },
-    });
-    topKingdomPost.push(animaliaPosts.length);
-
-    const protozoaPosts = await Post.findAll({
-      where: {
-        userId: id,
-        kingdom: "protozoa",
-      },
-    });
-    topKingdomPost.push(protozoaPosts.length);
-
-    const plantaePosts = await Post.findAll({
-      where: {
-        userId: id,
-        kingdom: "plantae",
-      },
-    });
-    topKingdomPost.push(plantaePosts.length);
-
-    const moneraPosts = await Post.findAll({
-      where: {
-        userId: id,
-        kingdom: "monera",
-      },
-    });
-    topKingdomPost.push(moneraPosts.length);
-
-    const fungiPosts = await Post.findAll({
-      where: {
-        userId: id,
-        kingdom: "fungi",
-      },
-    });
-    topKingdomPost.push(fungiPosts.length);
-
-    let maxPost = [0, 0];
-    for (let i = 0; i < topKingdomPost.length; i++) {
-      if (topKingdomPost[i] > maxPost[0]) {
-        maxPost[0] = i;
-        maxPost[1] = topKingdomPost[i];
-      }
-    }
-
-    user.dataValues["topKingdomPostsAPI"] = maxPost;
-
-    //////////////////////////////////////////////////////////////////////
-
-    /////////////////////// Top Comments /////////////////////////////////
-
-    let allKingdomComment = [];
-
-    const userComments = await Comment.findAll({
-      where: {
-        userId: id,
-        type: "COMMENT",
+        kingdom: [
+          'animalia',
+          'protozoa',
+          'plantae',
+          'bacteria',
+          'fungi',
+          'chromista',
+        ],
       },
     });
 
-    var commentInfo = [0, 0, 0, 0, 0];
-    for (let i = 0; i < userComments.length; i++) {
-      allKingdomComment[i] = await Post.findOne({
-        where: {
-          id: userComments[i].dataValues.postId,
+    const posts = allPosts.map(post => {
+      return post.dataValues;
+    });
+
+    const allComments = await Comment.findAll({
+      where: {
+        userId: id,
+        type: ['COMMENT', 'CONTESTATION'],
+      },
+      include: [
+        {
+          model: Post,
+          attributes: ['kingdom'],
         },
-      });
-
-      switch (allKingdomComment[i].dataValues.kingdom) {
-        case "animalia":
-          commentInfo[0] += 1;
-          break;
-        case "protozoa":
-          commentInfo[1] += 1;
-          break;
-        case "plantae":
-          commentInfo[2] += 1;
-          break;
-        case "monera":
-          commentInfo[3] += 1;
-          break;
-        case "fungi":
-          commentInfo[4] += 1;
-          break;
-      }
-    }
-
-    let maxComment = [0, 0];
-    for (let i = 0; i < commentInfo.length; i++) {
-      if (commentInfo[i] > maxComment[0]) {
-        maxComment[0] = i;
-        maxComment[1] = commentInfo[i];
-      }
-    }
-
-    user.dataValues["commentInfo"] = maxComment;
-
-    //////////////////////////////////////////////////////////////////////
-
-    /////////////////////// Top Contestation /////////////////////////////
-
-    let allKingdomContestation = [];
-    const userContestations = await Comment.findAll({
-      where: {
-        userId: id,
-        type: "CONTESTATION",
-      },
+      ],
     });
 
-    var contestationInfo = [0, 0, 0, 0, 0];
-    for (let i = 0; i < userContestations.length; i++) {
-      allKingdomContestation[i] = await Post.findOne({
-        where: {
-          id: userContestations[i].dataValues.postId,
-        },
-      });
+    const contestations = allComments
+      .map(comment => comment.dataValues)
+      .filter(comment => comment.type === 'CONTESTATION');
+    const comments = allComments
+      .map(comment => comment.dataValues)
+      .filter(comment => comment.type === 'COMMENT');
 
-      switch (allKingdomContestation[i].dataValues.kingdom) {
-        case "animalia":
-          contestationInfo[0] += 1;
-          break;
-        case "protozoa":
-          contestationInfo[1] += 1;
-          break;
-        case "plantae":
-          contestationInfo[2] += 1;
-          break;
-        case "monera":
-          contestationInfo[3] += 1;
-          break;
-        case "fungi":
-          contestationInfo[4] += 1;
-          break;
+    const postKingdoms = posts.reduce(
+      (acc, post) => {
+        const kingdom = post.kingdom || 'unknown';
+        acc[kingdom] = (acc[kingdom] || 0) + 1;
+        return acc;
+      },
+      {
+        animalia: 0,
+        protozoa: 0,
+        plantae: 0,
+        bacteria: 0,
+        fungi: 0,
+        chromista: 0,
       }
-    }
+    );
 
-    let maxContestation = [0, 0];
-    for (let i = 0; i < contestationInfo.length; i++) {
-      if (contestationInfo[i] > maxContestation[0]) {
-        maxContestation[0] = i;
-        maxContestation[1] = contestationInfo[i];
+    const topPostKingdom = Object.keys(postKingdoms).reduce((a, b) =>
+      postKingdoms[a] > postKingdoms[b] ? a : b
+    );
+
+    const commentKingdoms = comments.reduce(
+      (acc, comment) => {
+        const kingdom = comment.Post.kingdom || 'unknown';
+        acc[kingdom] = (acc[kingdom] || 0) + 1;
+        return acc;
+      },
+      {
+        animalia: 0,
+        protozoa: 0,
+        plantae: 0,
+        bacteria: 0,
+        fungi: 0,
+        chromista: 0,
       }
-    }
+    );
 
-    user.dataValues["contestationInfo"] = maxContestation;
+    const topCommentKingdom = Object.keys(commentKingdoms).reduce((a, b) =>
+      commentKingdoms[a] > commentKingdoms[b] ? a : b
+    );
 
-    //////////////////////////////////////////////////////////////////////
+    const contestationKingdoms = contestations.reduce(
+      (acc, contestation) => {
+        const kingdom = contestation.Post.kingdom || 'unknown';
+        acc[kingdom] = (acc[kingdom] || 0) + 1;
+        return acc;
+      },
+      {
+        animalia: 0,
+        protozoa: 0,
+        plantae: 0,
+        bacteria: 0,
+        fungi: 0,
+        chromista: 0,
+      }
+    );
 
-    /////////////////////// Somas contribuicois //////////////////////////
+    const topContestationKingdom = Object.keys(contestationKingdoms).reduce(
+      (a, b) => (contestationKingdoms[a] > contestationKingdoms[b] ? a : b)
+    );
 
-    let contributionsInfo = [0, 0, 0, 0, 0];
+    const statistics = {
+      animalia: {
+        totalCount:
+          postKingdoms.animalia +
+          commentKingdoms.animalia +
+          contestationKingdoms.animalia,
+        postsCount: postKingdoms.animalia,
+        commentsCount: commentKingdoms.animalia,
+        contestationsCount: contestationKingdoms.animalia,
+      },
+      protozoa: {
+        totalCount:
+          postKingdoms.protozoa +
+          commentKingdoms.protozoa +
+          contestationKingdoms.protozoa,
+        postsCount: postKingdoms.protozoa,
+        commentsCount: commentKingdoms.protozoa,
+        contestationsCount: contestationKingdoms.protozoa,
+      },
+      plantae: {
+        totalCount:
+          postKingdoms.plantae +
+          commentKingdoms.plantae +
+          contestationKingdoms.plantae,
+        postsCount: postKingdoms.plantae,
+        commentsCount: commentKingdoms.plantae,
+        contestationsCount: contestationKingdoms.plantae,
+      },
+      bacteria: {
+        totalCount:
+          postKingdoms.bacteria +
+          commentKingdoms.bacteria +
+          contestationKingdoms.bacteria,
+        postsCount: postKingdoms.bacteria,
+        commentsCount: commentKingdoms.bacteria,
+        contestationsCount: contestationKingdoms.bacteria,
+      },
+      fungi: {
+        totalCount:
+          postKingdoms.fungi +
+          commentKingdoms.fungi +
+          contestationKingdoms.fungi,
+        postsCount: postKingdoms.fungi,
+        commentsCount: commentKingdoms.fungi,
+        contestationsCount: contestationKingdoms.fungi,
+      },
+      chromista: {
+        totalCount:
+          postKingdoms.chromista +
+          commentKingdoms.chromista +
+          contestationKingdoms.chromista,
+        postsCount: postKingdoms.chromista,
+        commentsCount: commentKingdoms.chromista,
+        contestationsCount: contestationKingdoms.chromista,
+      },
+      topPostKingdom: {
+        name: topPostKingdom,
+        count: postKingdoms[topPostKingdom],
+      },
+      topCommentKingdom: {
+        name: topCommentKingdom,
+        count: commentKingdoms[topCommentKingdom],
+      },
+      topContestationKingdom: {
+        name: topContestationKingdom,
+        count: contestationKingdoms[topContestationKingdom],
+      },
+      totalPosts: posts.length,
+      totalComments: comments.length,
+      totalContestations: contestations.length,
+      totalContributions: posts.length + comments.length + contestations.length,
+    };
 
-    for (let i = 0; i < contestationInfo.length; i++) {
-      contributionsInfo[i] =
-        topKingdomPost[i] + commentInfo[i] + contestationInfo[i];
-    }
-
-    user.dataValues["contributionsInfo"] = contributionsInfo;
-
-    //
-    //
-    //
-    //
-    //
-
-    res.status(200).json(user);
+    res.status(200).json({ user, statistics });
   } catch (e) {
-    return res.status(500).json({ error: "internal error" });
+    console.error('Error fetching user:', e);
+    return res.status(500).json({ error: 'internal error' });
   }
 }
 
@@ -228,8 +227,8 @@ async function create(req, res) {
   }
 
   const userFound = await User.findOne({ where: { email: email } }).catch(
-    (error) => {
-      console.log("error getting user", error);
+    error => {
+      console.log('error getting user', error);
       return res.status(500).json({ code: 102, message: user_errors[102] });
     }
   );
@@ -251,11 +250,11 @@ async function create(req, res) {
     .then(() => {
       return res.status(200).json(200);
     })
-    .catch((e) => {
+    .catch(e => {
       console.log(e);
       return res
         .status(500)
-        .json({ code: 500, message: "Error creating user" });
+        .json({ code: 500, message: 'Error creating user' });
     });
 }
 
@@ -266,19 +265,19 @@ async function login(req, res) {
       where: { email: email },
     });
     if (!data) {
-      console.log("user not found");
+      console.log('user not found');
       return res.status(401).json({ code: 101, message: user_errors[101] });
     }
     const user = data.dataValues;
 
     const isValid = passwordValidation(password, user.password, user.salt);
-    if (!isValid) return res.status(401).json({ message: "password invalid" });
+    if (!isValid) return res.status(401).json({ message: 'password invalid' });
 
     const token = generateJwt(user.id, user.name, user.email);
     res.status(200).json({ token: token });
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal error" });
+    return res.status(500).json({ message: 'Internal error' });
   }
 }
 
@@ -286,12 +285,12 @@ async function uploadProfilePicture(req, res) {
   try {
     const { id } = req.params;
     if (!req.file) {
-      return res.status(400).json({ error: "Nenhuma imagem enviada" });
+      return res.status(400).json({ error: 'Nenhuma imagem enviada' });
     }
 
     const user = await User.findByPk(id);
     if (!user) {
-      return res.status(404).json({ error: "Usuário não encontrado" });
+      return res.status(404).json({ error: 'Usuário não encontrado' });
     }
     const profilePicturePath = `/uploads/images/${req.file.filename}`;
 
@@ -303,8 +302,8 @@ async function uploadProfilePicture(req, res) {
 
     return res.status(200).json({ profilePicture: profilePicturePath });
   } catch (error) {
-    console.error("Erro ao fazer upload da foto de perfil:", error);
-    return res.status(500).json({ error: "Erro interno no servidor" });
+    console.error('Erro ao fazer upload da foto de perfil:', error);
+    return res.status(500).json({ error: 'Erro interno no servidor' });
   }
 }
 
@@ -314,13 +313,17 @@ async function getProfilePicture(req, res) {
     const user = await User.findByPk(id);
 
     if (!user || !user.profilePicture) {
-      return res.status(404).json({ error: "Imagem de perfil não encontrada" });
+      return res.status(404).json({ error: 'Imagem de perfil não encontrada' });
     }
-    const imagePath = path.join(__dirname, "../../../uploads/images", path.basename(user.profilePicture));
+    const imagePath = path.join(
+      __dirname,
+      '../../../uploads/images',
+      path.basename(user.profilePicture)
+    );
     res.sendFile(imagePath);
   } catch (error) {
-    console.error("Erro ao buscar a imagem de perfil:", error);
-    return res.status(500).json({ error: "Erro interno no servidor" });
+    console.error('Erro ao buscar a imagem de perfil:', error);
+    return res.status(500).json({ error: 'Erro interno no servidor' });
   }
 }
 
