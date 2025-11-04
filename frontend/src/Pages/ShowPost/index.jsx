@@ -97,12 +97,7 @@ const Post = () => {
     <Layout>
       <Container
         container
-        sx={{
-          display: 'grid',
-          alignItems: 'start',
-          gap: '2vh',
-          margin: '2vh 0',
-        }}
+        className="grid items-start gap-4 m-4"
       >
         <HeaderPage
           title={post.title}

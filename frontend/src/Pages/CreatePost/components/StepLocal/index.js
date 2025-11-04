@@ -109,12 +109,7 @@ export default function StepLocal(props) {
     return (
         <form onSubmit={formik.handleSubmit}>
 
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '16px',
-                width: '100%',
-            }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 w-full gap-4">
                 {/*lado direito*/}
                 <div>
                     <Titulo>GEOLOCALIZAÇÃO:</Titulo>

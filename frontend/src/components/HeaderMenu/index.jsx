@@ -27,19 +27,6 @@ const logoStyle = {
   color: '#fff',
 };
 
-const menuOptionsStyle = {
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'flex-end',
-  gap: '3rem',
-  color: '#fff',
-  minHeight: '100%',
-  maxHeight: '100%',
-  textAlign: 'center',
-  fontSize: '16px',
-};
-
 const Logo = () => {
   return (
     <Link to="/" style={logoStyle}>
@@ -50,7 +37,7 @@ const Logo = () => {
 
 const MenuOptions = () => {
   return (
-    <div style={menuOptionsStyle}>
+    <div className="flex  items-center justify-end gap-3 text-white min-h-full max-h-full text-center text-[16px] sm:gap-5">
       <LinkWithoutDecoration redirectUrl="/help" text="Ajuda" />
       <LinkWithoutDecoration redirectUrl="/" text="Início" />
       <User />

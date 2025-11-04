@@ -1,15 +1,15 @@
 import React from 'react';
-import { StyledContainer } from './style';
-
 const Container = ({ children, ...props }) => {
   return (
     <div
       style={{
         display: 'flex',
-        justifyContent: 'center'
+        justifyContent: 'center',
       }}
     >
-      <StyledContainer {...props}>{children}</StyledContainer>
+      <div className="grid w-full px-0 sm:px-10 min-h-full sm:max-w-[80vw] overflow-x-hidden">
+        {children}
+      </div>
     </div>
   );
 };

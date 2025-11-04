@@ -9,12 +9,9 @@ const PostInfo = ({ post }) => {
   return (
     <Card
       sx={{
-        width: '100%',
-        height: 'fit-content',
         backgroundColor: '#f0f0f0',
-        display: 'grid',
-        marginBottom: '5px',
       }}
+      className="w-full h-fit grid mb-1.5"
     >
       <DetailsSection post={post} />
 

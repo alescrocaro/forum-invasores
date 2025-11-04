@@ -11,14 +11,7 @@ const DetailsSection = ({ post }) => {
   }, [post.Images]);
 
   return (
-    <Box
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '50% 50%',
-        alignItems: 'start',
-        marginBottom: '.15rem',
-      }}
-    >
+    <Box className="grid grid-cols-1 sm:grid-cols-2 items-start mb-2">
       <SpecimenSection post={post} images={images} setImages={setImages} />
       <LocationSection post={post} />
     </Box>

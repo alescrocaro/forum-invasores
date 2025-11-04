@@ -95,12 +95,7 @@ export default function StepEspecime(props) {
 
     return (
         <form onSubmit={formik.handleSubmit}>
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '16px',
-                width: '100%',
-            }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
                 <div>
                     <Titulo>TAXONOMIA:</Titulo>
                     <Subtitulo>Não se preocupe se não souber tudo, coloque as informações que você conhece e os membros lhe ajudarão!</Subtitulo>
