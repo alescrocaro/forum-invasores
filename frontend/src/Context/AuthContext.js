@@ -36,7 +36,7 @@ export function AuthProvider({ children }) {
     try {
       setLoading(true);
       const response = await createSession(email, password);
-      console.log('response', response);
+      // console.log('response', response);
 
       const token = response.data.token;
 
