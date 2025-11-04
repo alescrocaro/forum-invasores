@@ -70,8 +70,8 @@ Para criar e migrar o banco, execute (no backend):
 ```sh
 [forum-invasores/backend] $
 npm install
-npm create-db # utiliza o arquivo /src/database/config/config.json
-npm migrate-db
+npm run create-db # utiliza o arquivo /src/database/config/config.json
+npm run migrate-db
 ```
 
 Você pode criar um usuário automaticamente executando o comando:
