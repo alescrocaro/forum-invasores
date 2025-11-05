@@ -8,24 +8,38 @@ import Map from '../Map';
 import { Subtitulo, Titulo } from './style';
 
 
-const validateLatlng = (str) => {    
-    //remove all letters and special char except . and - 
-    str = str.replace(/[^\d.]+/g, '');
-    
-    //remove all . but the first
-    str = str.replace(/(?<=(.*\..*))\./gm, '');
-    
-    //remove all - but in the first char
-    if(str.charAt(0) === '-') str = '-' + str.replace(/-/g, '');
-    else str = str.replace(/-/g, '');
-    
-    //change all -. or ^. to -0.
-    str = str.replace(/((?<=-)\.|(?<=^)\.)/g, '0.');
+const validateLatlng = (raw) => {
+  if (raw === '' || raw === null || raw === undefined) return '';
 
-    // //change all 0+. or -0+.  to single 0
-    // str = str.replace(/((?<=-)|(?<=^))0+\./g, '0.');
-    return str;
-}
+  let str = String(raw);
+
+  // 1) Mantém apenas números, '-', '.' e ','
+  str = str.replace(/[^0-9.,-]+/g, '');
+
+  // 2) Garante que só exista 1 '-' e, se existir, ele fique somente no começo
+  if (str.includes('-')) {
+    const isNegative = str.trim().startsWith('-');
+    str = str.replace(/-/g, ''); // remove todos
+    if (isNegative) str = '-' + str;
+  }
+
+  // 3) Normaliza vírgula para ponto (somos BR mas o JS quer ponto)
+  //    Depois disso, vamos tratar os pontos.
+  str = str.replace(/,/g, '.');
+
+  // 4) Garante no máximo um ponto decimal
+  const sign = str.startsWith('-') ? '-' : '';
+  let body = sign ? str.slice(1) : str;
+
+  const parts = body.split('.');
+  if (parts.length > 1) {
+    // junta tudo depois do primeiro ponto em um só bloco
+    body = parts[0] + '.' + parts.slice(1).join('');
+  }
+
+  return sign + body;
+};
+
 
 export default function StepLocal(props) {
     const { formData, updateFormData } = useCreatePost();
