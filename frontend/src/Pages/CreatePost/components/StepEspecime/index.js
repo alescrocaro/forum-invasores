@@ -122,7 +122,7 @@ export default function StepEspecime(props) {
                             renderInput={(params) => (
                                 <CssTextField
                                     {...params}
-                                    label="Buscar por nome comum"
+                                    label="Buscar por espécie"
                                     InputProps={{
                                         ...params.InputProps,
                                         endAdornment: (
