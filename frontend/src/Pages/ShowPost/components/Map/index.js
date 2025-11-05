@@ -49,7 +49,7 @@ class Map extends React.Component {
         });
         // LEAFLET ----------------------------------------------------------------------
     }
-    
+
     render(){
         return(
             <Mapa id='map'/>

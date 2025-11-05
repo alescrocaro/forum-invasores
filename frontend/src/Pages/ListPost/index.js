@@ -11,8 +11,8 @@ import Map from "./components/Map";
 export default function ListPosts() {
   const { user } = useToken();
   //map filter controls
-  const [mapCenter, setMapCenter] = useState([-15, -48]); //tem que ficar onde esta o mapa e o headerpage
-  const [mapSearchRadius, setMapSearchRadius] = useState(12);
+  const [mapCenter, setMapCenter] = useState([-24.7, -51.9]); //tem que ficar onde esta o mapa e o headerpage
+  const [mapSearchRadius, setMapSearchRadius] = useState(7);
   const [mapShowRadius, setMapShowRadius] = useState(false);
   const [posts, setPosts] = useState([]);
   const [pagination, setPagination] = useState({});
