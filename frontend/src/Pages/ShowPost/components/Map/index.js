@@ -40,8 +40,8 @@ class Map extends React.Component {
         L.marker(position, {icon: this.getIcon(this.props.post.kingdom)})
             .addTo(map)
             .bindPopup(`<h5 style='margin: 0 0 .5em 0'>${this.props.post.title}</h5>
-                        <p style='margin: 0'>Lat: ${position[1].toFixed(5)}<br/>
-                        Lng: ${position[0].toFixed(5)}</p>`)
+                        <p style='margin: 0'>Lat: ${position[0].toFixed(5)}<br/>
+                        Lng: ${position[1].toFixed(5)}</p>`)
             .openPopup();
         
         map.on('click', () => {        
