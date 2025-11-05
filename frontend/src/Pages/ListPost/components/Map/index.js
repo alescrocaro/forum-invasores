@@ -41,7 +41,7 @@ class Map extends React.Component {
 
         //caso a localizacao do pc esteja desativado
         this.map.once('locationerror', () => {
-            this.map.setView([-15, -48], 4);
+            this.map.setView([-24.9, -50.5], 6.5);
         });
 
         //setar map center no inicio
