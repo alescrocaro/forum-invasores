@@ -17,6 +17,10 @@ const LocationCard = ({ locationDetailsData }) => {
         data: locationDetailsData.biome,
       },
       {
+        details: 'Fitofisionomia',
+        data: locationDetailsData.fitofisionomia || 'Não informado',
+      },
+      {
         details: 'Coord.',
         data: `Lat.: ${locationDetailsData.latlng?.coordinates[1].toFixed(
           5

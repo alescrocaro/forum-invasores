@@ -94,6 +94,7 @@ module.exports = {
       let {
         title,
         biome,
+        fitofisionomia,
         userName,
         specie,
         genus,
@@ -124,6 +125,7 @@ module.exports = {
         id: uuid(),
         title,
         biome,
+        fitofisionomia,
         userName,
         specie,
         genus,

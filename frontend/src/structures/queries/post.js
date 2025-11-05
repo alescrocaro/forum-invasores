@@ -1,7 +1,7 @@
 const postQueryBuilders = {
   updatePost: data => {
     return `{
-      x: ${data.aiiZeDaManga}
+      x: ${data.data}
     }`;
   },
 };

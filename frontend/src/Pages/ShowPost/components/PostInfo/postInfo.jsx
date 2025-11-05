@@ -5,6 +5,7 @@ import TagsSection from './TagsSection/tagsSection';
 
 const PostInfo = ({ post }) => {
   if (!post) return 'Carregando...';
+  console.log({post})
 
   return (
     <Card

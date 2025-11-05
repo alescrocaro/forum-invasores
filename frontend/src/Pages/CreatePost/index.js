@@ -45,6 +45,7 @@ export default function CreatePost() {
         imgUrl: '',
 
         biome: formData.biome,
+        fitofisionomia: formData.fitofisionomia,
         weather: formData.weather,
         country: formData.country,
         city: formData.city,

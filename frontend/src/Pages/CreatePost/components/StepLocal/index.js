@@ -3,6 +3,7 @@ import { useFormik } from 'formik';
 import React, { useState, useEffect } from 'react';
 import * as yup from 'yup';
 import { useCreatePost } from '../../../../Context/CreatePostContext';
+import { BIOMAS, FITOFISIONOMIAS, CLIMAS } from '../../../../constants/environment';
 import CssTextField from '../CssTextField';
 import Map from '../Map';
 import { Subtitulo, Titulo } from './style';
@@ -69,6 +70,7 @@ export default function StepLocal(props) {
     const formik = useFormik({
         initialValues: {
           biomeName: formData.biome || '',
+          fitofisionomia: formData.fitofisionomia || '',
           climateType: formData.weather || '',
           state: formData.state || '',
           city: formData.city || '',
@@ -76,6 +78,7 @@ export default function StepLocal(props) {
         },
         validationSchema: yup.object({
             biomeName: yup.string('Nome do Bioma').required('Campo obrigatório'),
+            fitofisionomia: yup.string('Fitofisionomia').required('Campo obrigatório'),
             climateType: yup.string('Tipo de clima').required('Campo obrigatório'),
             city: yup.string('Cidade').required('Campo obrigatório'),
             state: yup.string('Estado').required('Campo obrigatório'),
@@ -87,6 +90,7 @@ export default function StepLocal(props) {
 
             updateFormData({
                 biome: values.biomeName,
+                fitofisionomia: values.fitofisionomia,
                 weather: values.climateType,
                 country: values.country,
                 state: values.state,
@@ -162,7 +166,7 @@ export default function StepLocal(props) {
                                 onChange={(event, newValue) => {if(newValue) formik.setFieldValue('biomeName', newValue.label);}}
                                 isOptionEqualToValue={(option, value) => value}
                                 onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}
-                                options={biomas}
+                                options={BIOMAS}
 
                                 renderOption={(props, option) => (
                                     <Box component="li" {...props}>
@@ -185,13 +189,42 @@ export default function StepLocal(props) {
                             />
                             
                             <Autocomplete
+                                id="fitofisionomia"
+                                autoHighlight
+                                value={formik.values.fitofisionomia || null}
+                                onChange={(event, newValue) => {if(newValue) formik.setFieldValue('fitofisionomia', newValue.label);}}
+                                isOptionEqualToValue={(option, value) => value}
+                                onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}
+                                options={FITOFISIONOMIAS}
+
+                                renderOption={(props, option) => (
+                                    <Box component="li" {...props}>
+                                        {option.label}
+                                    </Box>
+                                )}
+
+                                renderInput={(params) => (
+                                    <CssTextField
+                                        {...params}
+                                        label="Fitofisionomia"
+                                        inputProps={{
+                                            ...params.inputProps,
+                                            autoComplete: 'new-password', // disable autocomplete and autofill
+                                        }}
+                                        error={formik.touched.fitofisionomia && Boolean(formik.errors.fitofisionomia)}
+                                        helperText={formik.touched.fitofisionomia && formik.errors.fitofisionomia}
+                                    />
+                                )}
+                            />
+                            
+                            <Autocomplete
                                 id="climateType"
                                 autoHighlight
                                 value={formik.values.climateType || null}
                                 onChange={(event, newValue) => {if(newValue) formik.setFieldValue('climateType', newValue.label);}}
                                 isOptionEqualToValue={(option, value) => value}
                                 onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}
-                                options={climas}
+                                options={CLIMAS}
 
                                 renderOption={(props, option) => (
                                     <Box component="li" {...props}>
@@ -280,77 +313,4 @@ export default function StepLocal(props) {
     );
 }
 
-//----------------------------------------------------------------
-//arrays
-
-const biomas = [
-    {label: 'Biomas montanos'},
-    {label: 'Caatinga'},
-    {label: 'Campina'},
-    {label: 'Campinarana'},
-    {label: 'Campo (bioma)'},
-    {label: 'Chaparral'},
-    {label: 'Charneca'},
-    {label: 'Deserto'},
-    {label: 'Estepe'},
-    {label: 'Floresta'},
-    {label: 'Floresta do Congo'},
-    {label: 'Florestas, bosques e matagais mediterrânicos'},
-    {label: 'Frigana'},
-    {label: 'Fynbos'},
-    {label: 'Ilha do céu'},
-    {label: 'Lavrado'},
-    {label: 'Manguezal'},
-    {label: 'Maquis'},
-    {label: 'Mata Atlântica'},
-    {label: 'Mata dos cocais'},
-    {label: 'Mata de Cipó'},
-    {label: 'Matagal'},
-    {label: 'Pampa'},
-    {label: 'Pantanal'},
-    {label: 'Pastagens e matagais de montanha'},
-    {label: 'Paul (ecossistema)'},
-    {label: 'Pradarias e savanas inundadas'},
-    {label: 'Puszta'},
-    {label: 'Restinga'},
-    {label: 'Restinga de Massambaba'},
-    {label: 'Rupununi Savannah'},
-    {label: 'Savana'},
-    {label: 'Selva'},
-    {label: 'Serenguéti'},
-    {label: 'Taiga'},
-    {label: 'Vegetação litorânea'},
-];
-
-const climas = [
-    {label: 'Af - Clima Equatorial'},
-    {label: 'Am - Clima de Monção'},
-    {label: 'AwAs - Clima de Savana'},
-    {label: 'BWh - Clima Árido Quente'},
-    {label: 'BWk - Clima Árido Frio'},
-    {label: 'BSh - Clima Semiárido Quente'},
-    {label: 'BSk - Clima Semiárido Frio'},
-    {label: 'Cfa - Clima Subtropical Úmido'},
-    {label: 'Cfb - Clima Oceânico Temperado'},
-    {label: 'Cfc - Clima Oceânico Subpolar'},
-    {label: 'Cwa - Clima Subtropical Úmido'},
-    {label: 'Cwb - Clima Subtropical de Altitude'},
-    {label: 'Cwc - Clima Subtropical Frio de Altitude'},
-    {label: 'Csa - Clima Mediterrânico de Verão Quente'},
-    {label: 'Csb - Clima Mediterrânico de Verão Fresco'},
-    {label: 'Csc - Clima Mediterrânico de Verão Frio'},
-    {label: 'Dfa - Clima Continental Úmido de Verão Quente'},
-    {label: 'Dfb - Clima Continental Úmido de Verão Fresco'},
-    {label: 'Dfc - Clima Subártico sem Estação Seca'},
-    {label: 'Dfd - Clima Subártico Extremamente Frio sem Estação Seca'},
-    {label: 'Dwa - Clima Continental Úmido de Verão Quente Influenciado Pelas Monções'},
-    {label: 'Dwb - Clima Continental Úmido de Verão Fresco Influenciado Pelas Monções'},
-    {label: 'Dwc - Clima Subártico Influenciado Pelas Monções'},
-    {label: 'Dwd - Clima Subártico Extremamente Frio Influenciado Pela Monções'},
-    {label: 'Dsa - Clima Continental Úmido de Verão Quente com Influência Mediterrânea'},
-    {label: 'Dsb - Clima Continental Úmido de Verão Fresco com Influência Mediterrânea'},
-    {label: 'Dsc - Clima Subártico com Estação Seca'},
-    {label: 'Dsd - Clima Subártico Extremamente Frio com Estação Seca'},
-    {label: 'ET - Clima de Tundra'},
-    {label: 'EF - Clima Glacial'},
-];
+// Using constants from environment.js

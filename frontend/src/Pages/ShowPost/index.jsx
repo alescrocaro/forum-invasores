@@ -28,6 +28,7 @@ const Post = () => {
 
   async function getPost(id) {
     PostController.getPost({ id }).then(data => {
+      console.log({data})
       setPost(data);
     });
   }

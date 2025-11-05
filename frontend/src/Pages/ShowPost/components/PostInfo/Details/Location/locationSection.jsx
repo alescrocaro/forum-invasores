@@ -29,6 +29,7 @@ const LocationSection = ({ post }) => {
         locationDetailsData={{
           weather: post.weather,
           biome: post.biome,
+          fitofisionomia: post.fitofisionomia,
           latlng: post.latlng,
           city: post.city,
           dateFound: post.dateFound,

@@ -22,6 +22,7 @@ export function CreatePostProvider({ children }) {
 
     // StepLocal
     biome: '',
+    fitofisionomia: '',
     weather: '',
     country: '',
     city: '',
@@ -53,6 +54,7 @@ export function CreatePostProvider({ children }) {
       genus: '',
       specie: '',
       biome: '',
+      fitofisionomia: '',
       weather: '',
       country: '',
       city: '',

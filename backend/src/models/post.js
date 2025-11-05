@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       title: DataTypes.STRING,
       biome: DataTypes.STRING,
+      fitofisionomia: DataTypes.STRING,
       imgUrl: DataTypes.STRING,
       userName: DataTypes.STRING,
       specie: DataTypes.STRING,
