@@ -95,10 +95,7 @@ const Post = () => {
 
   return (
     <Layout>
-      <Container
-        container
-        className="grid items-start gap-4 m-4"
-      >
+      <Container container className="grid items-start gap-4 m-4">
         <HeaderPage
           title={post.title}
           userName={username}
@@ -235,9 +232,17 @@ const Post = () => {
                   name="description"
                   value={formik.values.description}
                   onChange={formik.handleChange}
-                  error={formik.touched.title && Boolean(formik.errors.title)}
-                  helperText={formik.touched.title && formik.errors.title}
-                  label={'Seu comentário'}
+                  inputProps={{ maxLength: 255 }}
+                  error={
+                    formik.touched.description &&
+                    Boolean(formik.errors.description)
+                  }
+                  helperText={
+                    formik.touched.description && formik.errors.description
+                      ? formik.errors.description
+                      : `${formik.values.description.length}/255 caracteres`
+                  }
+                  label="Seu comentário"
                 />
                 {/* Box de botões */}
                 <Box
