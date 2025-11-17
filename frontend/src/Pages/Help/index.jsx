@@ -2,9 +2,6 @@ import { Card, Typography } from 'antd';
 import Meta from 'antd/es/card/Meta';
 import { AlertTriangleIcon, BinocularsIcon, BugIcon, CameraIcon, EyeIcon, InfoIcon, SquarePlusIcon, TargetIcon } from 'lucide-react';
 import HelpLPLayout from '../../components/Help/layout';
-import saguiDeTufoBranco1 from '../../img/sagui-de-tufo-branco-1.png';
-import saguiDeTufoBranco2 from '../../img/sagui-de-tufo-branco-2.png';
-import saguiDeTufoBranco3 from '../../img/sagui-de-tufo-branco-3.png';
 import ImageSlider from './imageSlider';
 
 const TargetSpecie = () => {
@@ -22,9 +19,9 @@ const TargetSpecie = () => {
         cover={
           <ImageSlider
             images={[
-              saguiDeTufoBranco1,
-              saguiDeTufoBranco2,
-              saguiDeTufoBranco3,
+              "/images/sagui-de-tufo-branco-1.png",
+              "/images/sagui-de-tufo-branco-2.png",
+              "/images/sagui-de-tufo-branco-3.png",
             ]}
           />
         }
