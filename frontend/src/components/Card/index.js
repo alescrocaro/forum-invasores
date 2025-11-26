@@ -49,12 +49,9 @@ export default function StyledCard({ post }) {
         {/* card com tudo dentro */}
         <div className="grid grid-cols-1 sm:grid-cols-7 w-full h-full hover:cursor-pointer hover:bg-[#f0f0f0]">
           {/* imagem */}
-          <BannerImage
-            component="img"
-            src={url}
-            alt="img"
-            className="col-span-1 sm:col-span-3 lg:col-span-2"
-          />
+          <div className="relative w-full h-48 sm:h-64 overflow-hidden rounded-xl col-span-1 sm:col-span-3 lg:col-span-2">
+            <BannerImage src={url} alt="img" />
+          </div>
 
           {/* conteudo */}
           <div className="w-full items-start overflow-hidden p-2 h-full col-span-1 sm:col-span-4 lg:col-span-5">
