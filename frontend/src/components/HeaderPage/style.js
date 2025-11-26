@@ -4,7 +4,11 @@ export const DescricaoG = styled.p`
   margin: 0;
   padding: 0;
   font-family: 'Montserrat', sans-serif;
+  font-size: 0.9em;
   color: #14aa6b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const DescricaoB = styled.p`

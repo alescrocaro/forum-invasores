@@ -28,7 +28,6 @@ const Post = () => {
 
   async function getPost(id) {
     PostController.getPost({ id }).then(data => {
-      console.log({data})
       setPost(data);
     });
   }
@@ -99,7 +98,7 @@ const Post = () => {
       <Container container className="grid items-start gap-4 m-4">
         <HeaderPage
           title={post.title}
-          userName={username}
+          userName={post.User?.name}
           dateFound={post.dateFound}
         />
 

@@ -90,6 +90,10 @@ export default function StyledCard({
               >
                 {title}
               </Typography>
+              
+              <DescricaoG>
+                Observado por <b>{userName?.split(" ")?.[0]}</b> em <b>{date?.getDate()}/{date?.getMonth() + 1}/{date?.getFullYear()}</b>.
+              </DescricaoG>
             </div>
             <div id="filter">
               {filter && (
