@@ -31,7 +31,7 @@ module.exports = {
             { model: UserResolvedContestation },
             {
               model: User,
-              attributes: ["name", "email", "id"],
+              attributes: ["name", "id"],
             },
           ],
           where: {
