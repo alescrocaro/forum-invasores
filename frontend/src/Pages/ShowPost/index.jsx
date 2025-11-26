@@ -86,8 +86,6 @@ const Post = () => {
     },
   });
 
-  const username = post.User ? post.User.name : 'user';
-
   useEffect(() => {
     getPost(id);
     getComments(id);
