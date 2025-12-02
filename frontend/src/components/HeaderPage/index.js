@@ -49,7 +49,7 @@ export default function StyledCard({
     applyFilters(filters);
   };
 
-  const date = new Date(dateFound);
+  const date = dateFound ? new Date(dateFound) : null;
 
   return (
     <>
@@ -90,10 +90,27 @@ export default function StyledCard({
               >
                 {title}
               </Typography>
-              
-              <DescricaoG>
-                Observado por <b>{userName?.split(" ")?.[0]}</b> em <b>{date?.getDate()}/{date?.getMonth() + 1}/{date?.getFullYear()}</b>.
-              </DescricaoG>
+
+              {userName || date ? (
+                <DescricaoG>
+                  Observado{" "}
+                  {userName ? (
+                    <>
+                      por <b>{userName.split(" ")?.[0]}</b>
+                    </>
+                  ) : null}
+                  {date ? (
+                    <>
+                      {" em "}
+                      <b>
+                        {date.getDate()}/{date.getMonth() + 1}/
+                        {date.getFullYear()}
+                      </b>
+                    </>
+                  ) : null}
+                  .
+                </DescricaoG>
+              ) : null}
             </div>
             <div id="filter">
               {filter && (
